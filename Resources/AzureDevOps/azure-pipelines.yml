@@ -1,5 +1,5 @@
 variables:
-    SolutionBaseName: '__SolutionBaseName__'
+    SolutionBaseName: 'DFC.Api.Lmi.Delta.Report'
     BuildPlatform: 'any cpu'
     BuildConfiguration: 'release'
 
