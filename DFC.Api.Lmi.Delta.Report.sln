@@ -1,11 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31105.61
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFC.Api.Lmi.Delta.Report", "DFC.Api.Lmi.Delta.Report\DFC.Api.Lmi.Delta.Report.csproj", "{7E023F2F-27DE-4948-BDD9-C5D2AC679CB0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFC.Api.Lmi.Delta.Report", "DFC.Api.Lmi.Delta.Report\DFC.Api.Lmi.Delta.Report.csproj", "{7E023F2F-27DE-4948-BDD9-C5D2AC679CB0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFC.Api.Lmi.Delta.Report.UnitTests", "DFC.Api.Lmi.Delta.Report.UnitTests\DFC.Api.Lmi.Delta.Report.UnitTests.csproj", "{5EDC0497-5F8B-42C6-B58F-866382951F69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFC.Api.Lmi.Delta.Report.UnitTests", "DFC.Api.Lmi.Delta.Report.UnitTests\DFC.Api.Lmi.Delta.Report.UnitTests.csproj", "{5EDC0497-5F8B-42C6-B58F-866382951F69}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{FF1CCB0C-2588-47EC-9575-A9B76DF46158}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		CODEOWNERS = CODEOWNERS
+		DFC.Digital.CodeAnalysis.ruleset = DFC.Digital.CodeAnalysis.ruleset
+		LICENSE = LICENSE
+		README.md = README.md
+		stylecop.json = stylecop.json
+		UnitTests.CodeAnalysis.ruleset = UnitTests.CodeAnalysis.ruleset
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A6DBC321-8D8E-4C89-B8A2-7BD4522EA7E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +29,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{7E023F2F-27DE-4948-BDD9-C5D2AC679CB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -44,5 +55,14 @@ Global
 		{5EDC0497-5F8B-42C6-B58F-866382951F69}.Release|x64.Build.0 = Release|Any CPU
 		{5EDC0497-5F8B-42C6-B58F-866382951F69}.Release|x86.ActiveCfg = Release|Any CPU
 		{5EDC0497-5F8B-42C6-B58F-866382951F69}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5EDC0497-5F8B-42C6-B58F-866382951F69} = {A6DBC321-8D8E-4C89-B8A2-7BD4522EA7E7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0B922670-5731-4EE7-B44D-A90EF1D5B3A0}
 	EndGlobalSection
 EndGlobal
