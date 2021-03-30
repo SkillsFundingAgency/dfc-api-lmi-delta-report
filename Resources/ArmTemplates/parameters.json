@@ -1,0 +1,102 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "appSharedStorageAccountName": {
+        "value": "__appSharedStorageAccountName__"
+      },
+      "appSharedResourceGroup": {
+        "value": "__appSharedResourceGroup__"
+      },
+      "aspTier": {
+        "value": "__aspTier__"
+      },
+      "aseHostingEnvironmentName": {
+        "value": "__AseServiceName__"
+      },
+      "aseResourceGroup": {
+        "value": "__aseResourceGroup__"
+      },
+      "cosmosDbName": {
+          "value": "__appSharedCosmosDBName__"
+      },
+      "cosmosDbKey": {
+          "value": "__appSharedCosmosPrimaryKey__"
+      },
+      "CosmosDbResourceGroup": {
+          "value": "__appSharedResourceGroup__"
+      },
+      "cosmosJobGroupDbCollectionName": {
+        "value": "__cosmosJobGroupDbCollectionName__"
+      },
+      "lmiTransformationAppDatabaseNeedsCreation": {
+          "value": __CosmosDbDatabaseDoesntExist__
+      },
+      "lmiTransformationAppDatabaseThroughput": {
+          "value": __lmiTransformationAppDatabaseThroughput__
+      },
+      "enableAlerts": {
+          "value": __EnableAzureMonitorAlerting__
+      },
+      "aspSize": {
+        "value": "__aspSize__"
+      },
+      "aspInstances": {
+        "value": __aspInstances__
+      },
+      "environment": {
+        "value": "__ReleaseEnvironmentName__",
+        "metadata": {
+            "comment": "Bug in tokenisation task prevents referencing Release.EnvironmentName directly.  https://github.com/TotalALM/VSTS-Tasks/issues/29"
+        }
+      },
+      "ApimLmiKey": {
+        "value": "__ApimLmiKey__"
+      },
+      "ExceptionCountThreshold": {
+          "value": "__ExceptionCountThreshold__"
+      },
+      "MemoryPercentageThreshold": {
+          "value": "__MemoryPercentageThreshold__"
+      },
+      "CPUPercentageThreshold": {
+          "value": "__CPUPercentageThreshold__"
+      },
+      "contentUrl": {
+        "value": "__contentUrl__"
+      },
+      "SubscriptionSettingsEndpoint": {
+        "value": "__SubscriptionSettingsEndpoint__"
+      },
+      "subscriptionUrl": {
+        "value": "__subscriptionUrl__"
+      },
+      "EventGridAegSasKey": {
+          "value": "__EventGridAegSasKey__"
+      },
+      "EventGridTopicUrl": {
+          "value": "__EventGridTopicUrl__"
+      },
+      "EventGridPublishClientOptionsApiEndpoint": {
+          "value": "__EventGridPublishClientOptionsApiEndpoint__"
+      },
+      "EventGridSubjectPrefix": {
+          "value": "__EventGridSubjectPrefix__"
+      },
+      "apimServiceName": {
+          "value": "__apimServiceName__"
+      },
+      "apimProductName": {
+          "value": "__apimProductName__"
+      },
+      "apimApiName": {
+          "value": "__apimApiName__"
+      },
+      "apimLoggerName": {
+          "value": "__apimLoggerName__"
+      },
+      "apimResourceGroup": {
+          "value": "__SharedResourceGroupName__"
+      }
+    }
+  }
