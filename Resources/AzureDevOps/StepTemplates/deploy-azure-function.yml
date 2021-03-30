@@ -1,0 +1,87 @@
+parameters:
+  WebAppName: ''
+  AzureSubscription: ''
+  FunctionAppDomain: ''
+  PackageFile: ''
+  ResourceGroup: ''
+  SharedResourceGroup: ''
+  ApimServiceName: ''
+  ApimProductName: ''
+  ApimApiName: ''
+  SubscriptionPosturi: ''
+  APIMPolicyPath: ''
+
+steps:
+- checkout: dfc-devops
+  path: 's/dfc-devops/'
+
+- task: AzureAppServiceManage@0
+  displayName: 'Start Azure App Service:${{ parameters.WebAppName }}'
+  inputs:
+    azureSubscription: '${{ parameters.AzureSubscription }}'
+    Action: 'Start Azure App Service'
+    WebAppName: '${{ parameters.WebAppName }}'
+    SpecifySlotOrASE: true
+    ResourceGroupName: '${{ parameters.ResourceGroup }}'
+    Slot: staging
+
+- task: AzureRmWebAppDeployment@4
+  displayName: 'Azure App Service Deploy: ${{ parameters.WebAppName }}'
+  inputs:
+    azureSubscription: '${{ parameters.AzureSubscription }}'
+    appType: functionApp
+    WebAppName: '${{ parameters.WebAppName }}'
+    Package: "${{ parameters.PackageFile }}"
+    deployToSlotOrASE: true
+    ResourceGroupName: '${{ parameters.ResourceGroup }}'
+    SlotName: staging
+
+- task: AzureAppServiceManage@0
+  displayName: 'Swap Slots: ${{ parameters.WebAppName }}'
+  inputs:
+    azureSubscription: '${{ parameters.AzureSubscription }}'
+    WebAppName: '${{ parameters.WebAppName }}'
+    ResourceGroupName: '${{ parameters.ResourceGroup }}'
+    SourceSlot: staging
+
+- task: AzureAppServiceManage@0
+  displayName: 'Stop Azure App Service Slots: ${{ parameters.WebAppName }}'
+  inputs:
+    azureSubscription: '${{ parameters.AzureSubscription }}'
+    Action: 'Stop Azure App Service'
+    WebAppName: '${{ parameters.WebAppName }}'
+    SpecifySlotOrASE: true
+    ResourceGroupName: '${{ parameters.ResourceGroup }}'
+    Slot: staging
+
+- task: AzurePowerShell@4
+  displayName: 'Import OpenAPI specification'
+  inputs:
+    azureSubscription: '${{ parameters.AzureSubscription }}'
+    ScriptPath: '$(Agent.BuildDirectory)/s/dfc-devops//PSCoreScripts/Import-ApimSwaggerApiDefinition.ps1'
+    ScriptArguments: ' -ApimResourceGroup ${{ parameters.SharedResourceGroup }} -InstanceName ${{ parameters.ApimServiceName }} -ApiName ${{ parameters.ApimProductName }}-${{ parameters.ApimApiName }} -ApiPath ${{ parameters.ApimProductName }}/${{ parameters.ApimApiName }} -SwaggerSpecificationUrl https://${{ parameters.WebAppName }}.${{ parameters.FunctionAppDomain }}/swagger/json -OutputFilePath $(Agent.BuildDirectory)/SwaggerFile -Verbose'
+    azurePowerShellVersion: LatestVersion
+
+- task: esfadevops.Tokenization.custom-build-task.Tokenization@0
+  displayName: 'Tokenization: Transform file APIM Policy File'
+  inputs:
+    SourcePath: '${{ parameters.APIMPolicyPath }}'
+    TargetFileNames: 'ApimPolicy-IsolatedAzureFunctionAsEventGridWebhookEndpoint.xml'
+
+- task: AzurePowerShell@5
+  displayName: 'Apply EventGrid APIM Policy'
+  inputs:
+    azureSubscription: '${{ parameters.AzureSubscription }}'
+    ScriptPath: '$(Agent.BuildDirectory)/s/dfc-devops/PSCoreScripts/Set-ApimPolicy.ps1'
+    ScriptArguments: '-PolicyScope operation -ApimResourceGroup ${{ parameters.SharedResourceGroup }} -ApimServiceName ${{ parameters.ApimServiceName }} -PolicyFilePath "$(Agent.BuildDirectory)/dfc.api.lmi.transformation.apimpolicies/ApimPolicy-IsolatedAzureFunctionAsEventGridWebhookEndpoint.xml" -ApiId ${{ parameters.ApimProductName }}-${{ parameters.ApimApiName }} -OperationId LMIWebhook'
+    azurePowerShellVersion: LatestVersion
+
+- task: AzurePowerShell@5
+  displayName: 'Send a post request to /subscription'
+  inputs:
+    azureSubscription: '${{ parameters.AzureSubscription }}'
+    ScriptType: InlineScript
+    Inline: |
+     Invoke-WebRequest -Uri ${{ parameters.SubscriptionPosturi }} -Method POST
+    errorActionPreference: continue
+    azurePowerShellVersion: LatestVersion
