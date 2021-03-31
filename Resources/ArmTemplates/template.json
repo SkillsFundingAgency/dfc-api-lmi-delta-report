@@ -61,7 +61,7 @@
     "MemoryPercentageThreshold": {
       "type": "string"
     },
-    "cosmosJobGroupDbCollectionName": {
+    "cosmosDeltaReportsCollectionName": {
       "type": "string",
       "metadata": {
         "description": "The name of the collection to create"
@@ -325,7 +325,7 @@
               },
               {
                 "name": "Configuration__CosmosDbConnections__LmiDeltaReports__CollectionId",
-                "value": "[parameters('cosmosJobGroupDbCollectionName')]"
+                "value": "[parameters('cosmosDeltaReportsCollectionName')]"
               },
               {
                 "name": "Configuration__CosmosDbConnections__LmiDeltaReports__PartitionKey",
@@ -416,7 +416,7 @@
     },
     {
       "apiVersion": "2017-05-10",
-      "name": "[parameters('cosmosJobGroupDbCollectionName')]",
+      "name": "[parameters('cosmosDeltaReportsCollectionName')]",
       "type": "Microsoft.Resources/deployments",
       "resourceGroup": "[parameters('CosmosDbResourceGroup')]",
       "properties": {
@@ -433,7 +433,7 @@
             "value": "[variables('cosmosDbDatabaseName')]"
           },
           "collectionName": {
-            "value": "[parameters('cosmosJobGroupDbCollectionName')]"
+            "value": "[parameters('cosmosDeltaReportsCollectionName')]"
           },
           "provisionRequestUnits": {
             "value": false
