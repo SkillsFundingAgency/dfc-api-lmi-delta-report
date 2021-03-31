@@ -2,7 +2,7 @@ variables:
 - name: ReleaseEnvironmentName
   value: DEV-DRAFT
 - name: WebAppPrefix
-  value: dfc-dev-draft-api-lmi-delta-reports
+  value: dfc-dev-draft-api-lmi-delta-report
 - name: ResourceGroup
   value: $(WebAppPrefix)-rg
 - name: aspTier
@@ -34,7 +34,7 @@ variables:
 - name: FunctionAppName
   value: $(WebAppPrefix)-fa
 - name: ApplicationName
-  value: dfc-api-lmi-delta-reports
+  value: dfc-api-lmi-delta-report
 - name: apimLoggerName
   value: LMI-logger
 - name: apimProductName
