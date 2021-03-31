@@ -24,7 +24,7 @@ variables:
 - name: cosmosDeltaReportsCollectionName
   value: delta-reports
 - name: SubscriptionSettingsEndpoint
-  value: $(ApimProxyAddress)/LMI/delta-report/lmi/webhook?subscription-key=$(apimLmiKey)
+  value: $(ApimProxyAddress)/LMI/delta-reports/lmi/webhook?subscription-key=$(apimLmiKey)
 - name: subscriptionUrl
   value: https://dfc-sit-api-eventgridsubscriptions-fa.$(FunctionAppDomain)/api/execute/
 - name: EventGridPublishClientOptionsApiEndpoint
