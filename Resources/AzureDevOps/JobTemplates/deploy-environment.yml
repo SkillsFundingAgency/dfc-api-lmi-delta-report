@@ -1,0 +1,76 @@
+parameters:
+  AzureSubscription: ''
+  EnvironmentTag: 'DEV/Test'
+  ParentBusiness: ''
+  ServiceOffering: ''
+  ResourceGroup: ''
+  DfCDevopsPath: ''
+  PackageFile:  ''
+  ArmTemplateFolder: ''
+  EnvironmentName: ''
+  AppSharedResourceGroup: ''
+  appSharedCosmosDBName: ''
+  AppServiceName: ''
+  ApimLoggerName: ''
+  ApimProductName: ''
+  SharedResourceGroup: ''
+  ApimServiceName: ''
+  ApimProductInstanceName: ''
+  FunctionAppDomain: ''
+  ArmOutputVariableName: 'ARMOutputs'
+  APIMPolicyPath: ''
+  ApimImportScript: ''
+  SpecificationPath: ''
+  ApimApiName: ''
+  SubscriptionPosturi: ''
+  Apis: []
+  Location: 'West Europe'
+  SetEsfaResourceGroupTagsScript: 'https://raw.githubusercontent.com/SkillsFundingAgency/dfc-devops/master/PSScripts/Set-EsfaResourceGroupTags.ps1'
+
+jobs:
+- deployment: DeployTemplate
+  displayName: "Deploy ARM Templates"
+  environment: ${{ parameters.EnvironmentName }}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - template: ../StepTemplates/deploy-arm-template.yml
+          parameters: 
+            AzureSubscription: '${{ parameters.AzureSubscription }}'
+            DfCDevopsPath: '${{ parameters.DfCDevopsPath }}'
+            SetEsfaResourceGroupTagsScript: '${{ parameters.SetEsfaResourceGroupTagsScript }}'
+            EnvironmentTag: '${{ parameters.EnvironmentTag }}'
+            ParentBusiness: '${{ parameters.ParentBusiness }}'
+            ServiceOffering: '${{ parameters.ServiceOffering }}'
+            ResourceGroup: '${{ parameters.ResourceGroup }}'
+            Location: '${{ parameters.Location }}'
+            ArmOutputVariableName: '${{ parameters.ArmOutputVariableName }}'
+            ArmTemplateFolder: '${{ parameters.ArmTemplateFolder }}'
+            AppSharedResourceGroup: '${{ parameters.AppSharedResourceGroup }}'
+            appSharedCosmosDBName: '${{ parameters.appSharedCosmosDBName }}'
+
+- ${{ each apiPartition in parameters.Apis }}:
+  - ${{ each api in apiPartition }}:
+    - deployment: Deploy${{ api.name }}
+      displayName: "Deploy ${{ api.name }}"
+      environment: ${{ parameters.EnvironmentName }}
+      dependsOn: 
+      - DeployTemplate
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - template: ../StepTemplates/deploy-azure-function.yml
+              parameters:
+                WebAppName: '${{ api.azureFunctionName }}'
+                AzureSubscription: '${{ parameters.AzureSubscription }}'
+                FunctionAppDomain: '${{ parameters.FunctionAppDomain }}'
+                PackageFile: '${{ parameters.PackageFile }}'
+                ResourceGroup: '${{ parameters.ResourceGroup }}'
+                SharedResourceGroup: '${{ parameters.SharedResourceGroup }}'
+                ApimServiceName: '${{ parameters.ApimServiceName }}'
+                APIMProductName: '${{ parameters.ApimProductName }}'
+                APIMApiName: '${{ parameters.ApimApiName }}'
+                SubscriptionPosturi: '${{ parameters.SubscriptionPosturi }}'
+                APIMPolicyPath: '${{ parameters.APIMPolicyPath  }}'

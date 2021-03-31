@@ -1,0 +1,96 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "appSharedResourceGroup": {
+        "value": "dfc-dev-app-sharedresources-rg"
+      },
+      "aspTier": {
+        "value": "Standard"
+      },
+      "aspSize": {
+        "value": "2"
+      },
+      "aspInstances": {
+        "value": 2
+      },
+      "ApimLmiKey": {
+        "value": "123456789"
+      },
+      "Environment": {
+        "value": "FOO"
+      },
+      "cosmosDbKey": {
+          "value": "not-a-real-key"
+      },
+      "CosmosDbResourceGroup": {
+          "value": "dfc-dev-app-sharedresources-rg"
+      },
+      "lmiDeltaReportAppDatabaseNeedsCreation": {
+          "value": true
+      },
+      "lmideltaReportAppDatabaseThroughput": {
+          "value": 2
+      },
+      "enableAlerts": {
+          "value": false
+      },
+      "cosmosDbName": {
+        "value": "cosmosDB"
+      },
+      "cosmosDeltaReportsCollectionName": {
+        "value": "cosmosDeltaReportsCollectionName"
+      },
+      "appSharedStorageAccountName": {
+        "value": "dfcdevappsharedstr"
+      },
+      "ExceptionCountThreshold": {
+          "value": "0"
+      },
+      "MemoryPercentageThreshold": {
+          "value": "0"
+      },
+      "CPUPercentageThreshold": {
+          "value": "0"
+      },
+      "SubscriptionSettingsEndpoint": {
+        "value": "SubscriptionSettingsEndpoint"
+      },
+      "subscriptionUrl":{
+        "value": "subscriptionUrl"
+      },
+      "EventGridAegSasKey": {
+          "value": "EventGridAegSasKey"
+      },
+      "EventGridTopicUrl": {
+          "value": "EventGridTopicUrl"
+      },
+      "EventGridPublishClientOptionsApiEndpoint": {
+          "value": "EventGridPublishClientOptionsApiEndpoint"
+      },
+      "EventGridSubjectPrefix": {
+          "value": "EventGridSubjectPrefix"
+      },
+      "apimLoggerName": {
+        "value": "LMI-logger"
+      },
+      "apimResourceGroup": {
+        "value": "dfc-test-template-rg"
+      },
+      "apimServiceName": {
+        "value": "an-apim-instance"
+      },
+      "apimProductName": {
+        "value": "LMI"
+      },
+      "apimApiName": {
+        "value": "api-name"
+      },
+      "DraftJobGroupClientOptionsBaseAddress": {
+        "value": "DraftJobGroupClientOptionsBaseAddress"
+      },
+      "PublishedJobGroupClientOptionsBaseAddress": {
+        "value": "PublishedJobGroupClientOptionsBaseAddress"
+      }
+    }
+  }

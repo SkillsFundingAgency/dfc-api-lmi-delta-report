@@ -1,0 +1,641 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appSharedResourceGroup": {
+      "type": "string"
+    },
+    "appSharedStorageAccountName": {
+      "type": "string"
+    },
+    "aspInstances": {
+      "type": "int"
+    },
+    "aspSize": {
+      "type": "string"
+    },
+    "aspTier": {
+      "type": "string"
+    },
+    "ApimLmiKey": {
+      "type": "string"
+    },
+    "aseHostingEnvironmentName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "aseResourceGroup": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "environment": {
+      "type": "string"
+    },
+    "CosmosDbResourceGroup": {
+      "type": "string"
+    },
+    "cosmosDbName": {
+      "type": "string"
+    },
+    "cosmosDbKey": {
+      "type": "securestring"
+    },
+    "lmiDeltaReportAppDatabaseNeedsCreation": {
+      "type": "bool"
+    },
+    "lmideltaReportAppDatabaseThroughput": {
+      "type": "int"
+    },
+    "enableAlerts": {
+      "type": "bool",
+      "metadata": {
+        "description": "Enable or disable alerting"
+      }
+    },
+    "ExceptionCountThreshold": {
+      "type": "string"
+    },
+    "CPUPercentageThreshold": {
+      "type": "string"
+    },
+    "MemoryPercentageThreshold": {
+      "type": "string"
+    },
+    "cosmosDeltaReportsCollectionName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the collection to create"
+      }
+    },
+    "SubscriptionSettingsEndpoint": {
+      "type": "string"
+    },
+    "subscriptionUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "subscriptionUrl"
+      }
+    },
+    "EventGridAegSasKey": {
+      "type": "securestring"
+    },
+    "EventGridTopicUrl": {
+      "type": "string"
+    },
+    "EventGridPublishClientOptionsApiEndpoint": {
+      "type": "securestring"
+    },
+    "EventGridSubjectPrefix": {
+      "type": "securestring"
+    },
+    "apimServiceName": {
+      "type": "string"
+    },
+    "apimProductName": {
+      "type": "string"
+    },
+    "apimApiName": {
+      "type": "string"
+    },
+    "apimLoggerName": {
+      "type": "string"
+    },
+    "apimResourceGroup": {
+      "type": "string"
+    },
+    "DraftJobGroupClientOptionsBaseAddress": {
+      "type": "string"
+    },
+    "PublishedJobGroupClientOptionsBaseAddress": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "appServicePlanName": "[concat(variables('resourcePrefix'), '-asp')]",
+    "appServicePlanResourceGroup": "[concat(variables('resourcePrefix'),'-rg')]",
+    "buildingBlocksDfcBaseUrl": "https://raw.githubusercontent.com/SkillsFundingAgency/dfc-devops/master/ArmTemplates/",
+    "resourcePrefix": "[tolower(concat('dfc-', tolower(parameters('Environment')), '-api-lmi-delta-report'))]",
+    "cosmosDbCollectionPartitionKey": "/PartitionKey",
+    "cosmosDbDatabaseName": "dfc-api-lmi-delta-report",
+    "cosmosDbEndpoint": "[concat('https://', parameters('cosmosDbName'), '.documents.azure.com:443/')]",
+    "functionAppName": "[concat(variables('ResourcePrefix'), '-fa')]",
+    "functionAppInsightsName": "[concat(variables('resourcePrefix'), '-ai')]",
+    "apimApiName": "[concat(parameters('apimProductName'), '-', parameters('apimApiName'))]",
+    "ActionGroupName": "[concat('dfc-', replace(tolower(parameters('Environment')), '-draft', ''), '-app-sharedresources-actgrp')]"
+  },
+  "resources": [
+    {
+      "name": "[concat('apim-logger-', parameters('apimLoggerName'))]",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[parameters('apimResourceGroup')]",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('BuildingBlocksDfcBaseUrl'), 'APIM/apim-logger.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "apimServiceName": {
+            "value": "[parameters('apimServiceName')]"
+          },
+          "productDisplayName": {
+            "value": "[parameters('apimProductName')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat('apim-product-', parameters('apimProductName'))]",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[parameters('apimResourceGroup')]",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('BuildingBlocksDfcBaseUrl'), 'APIM/apim-product.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "allowAnonymousAccess": {
+            "value": false
+          },
+          "apimServiceName": {
+            "value": "[parameters('apimServiceName')]"
+          },
+          "productDisplayName": {
+            "value": "[parameters('apimProductName')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat('apim-api-', variables('apimApiName'))]",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[parameters('apimResourceGroup')]",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('BuildingBlocksDfcBaseUrl'), 'APIM/apim-api.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "apimLoggerName": {
+            "value": "[parameters('apimLoggerName')]"
+          },
+          "apimProductInstanceName": {
+            "value": "[parameters('apimProductName')]"
+          },
+          "apimServiceName": {
+            "value": "[parameters('apimServiceName')]"
+          },
+          "apiName": {
+            "value": "[variables('apimApiName')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[concat('apim-product-', parameters('apimProductName'))]",
+        "[concat('apim-logger-', parameters('apimLoggerName'))]"
+      ]
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "[variables('appServicePlanName')]",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('buildingBlocksDfcBaseUrl'), 'app-service-plan.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "appServicePlanName": {
+            "value": "[variables('appServicePlanName')]"
+          },
+          "aseHostingEnvironmentName": {
+            "value": "[parameters('aseHostingEnvironmentName')]"
+          },
+          "aseResourceGroup": {
+            "value": "[parameters('aseResourceGroup')]"
+          },
+          "aspSize": {
+            "value": "[parameters('aspSize')]"
+          },
+          "aspInstances": {
+            "value": "[parameters('aspInstances')]"
+          },
+          "nonASETier": {
+            "value": "[parameters('aspTier')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "[variables('functionAppInsightsName')]",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('buildingBlocksDfcBaseUrl'), 'application-insights.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "appInsightsName": {
+            "value": "[variables('functionAppInsightsName')]"
+          },
+          "attachedService": {
+            "value": ""
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "[variables('functionAppName')]",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('buildingBlocksDfcBaseUrl'), 'app-service.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "appServiceName": {
+            "value": "[variables('functionAppName')]"
+          },
+          "appServicePlanName": {
+            "value": "[variables('appServicePlanName')]"
+          },
+          "appServicePlanResourceGroup": {
+            "value": "[variables('appServicePlanResourceGroup')]"
+          },
+          "appServiceType": {
+            "value": "functionapp"
+          },
+          "deployStagingSlot": {
+            "value": true
+          },
+          "clientAffinity": {
+            "value": true
+          },
+          "appServiceAppSettings": {
+            "value": [
+              {
+                "name": "FUNCTIONS_EXTENSION_VERSION",
+                "value": "~3"
+              },
+              {
+                "name": "FUNCTIONS_WORKER_RUNTIME",
+                "value": "dotnet"
+              },
+              {
+                "name": "MSDEPLOY_RENAME_LOCKED_FILES",
+                "value": "1"
+              },
+              {
+                "name": "WEBSITE_RUN_FROM_PACKAGE",
+                "value": "1"
+              },
+              {
+                "name": "AzureWebJobsStorage",
+                "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('appSharedStorageAccountName'),';AccountKey=',listKeys(resourceId(parameters('appSharedResourceGroup'), 'Microsoft.Storage/storageAccounts', parameters('appSharedStorageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value, ';EndpointSuffix=core.windows.net')]"
+              },
+              {
+                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                "value": "[reference(variables('functionAppInsightsName')).outputs.InstrumentationKey.value]"
+              },
+              {
+                "name": "ApiSuffix",
+                "value": "[if(contains(variables('resourcePrefix'),'draft'),'(draft)','')]"
+              },
+              {
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReports__AccessKey",
+                "value": "[parameters('cosmosDbKey')]"
+              },
+              {
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReports__EndpointUrl",
+                "value": "[variables('cosmosDbEndpoint')]"
+              },
+              {
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReports__DatabaseId",
+                "value": "[variables('cosmosDbDatabaseName')]"
+              },
+              {
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReports__CollectionId",
+                "value": "[parameters('cosmosDeltaReportsCollectionName')]"
+              },
+              {
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReports__PartitionKey",
+                "value": "[variables('cosmosDbCollectionPartitionKey')]"
+              },
+              {
+                "name": "DraftJobGroupClientOptions__BaseAddress",
+                "value": "[parameters('DraftJobGroupClientOptionsBaseAddress')]"
+              },
+              {
+                "name": "PublishedJobGroupClientOptions__BaseAddress",
+                "value": "[parameters('PublishedJobGroupClientOptionsBaseAddress')]"
+              },
+              {
+                "name": "SubscriptionSettings__Endpoint",
+                "value": "[parameters('SubscriptionSettingsEndpoint')]"
+              },
+              {
+                "name": "SubscriptionSettings__SubscriptionServiceEndpoint",
+                "value": "[parameters('subscriptionUrl')]"
+              },
+              {
+                "name": "SubscriptionSettings__ApiKey",
+                "value": "[parameters('apimLmiKey')]"
+              },
+              {
+                "name": "SubscriptionSettings__Filter__BeginsWith",
+                "value": "/dfc-app-jobgroups/"
+              },
+              {
+                "name": "SubscriptionSettings__Filter__IncludeEventTypes__0",
+                "value": "[if(contains(variables('resourcePrefix'),'draft'),'draft','published')]"
+              },
+              {
+                "name": "EventGridClientOptions__TopicKey",
+                "value": "[parameters('EventGridAegSasKey')]"
+              },
+              {
+                "name": "EventGridClientOptions__TopicEndpoint",
+                "value": "[parameters('EventGridTopicUrl')]"
+              },
+              {
+                "name": "EventGridClientOptions__SubjectPrefix",
+                "value": "[parameters('EventGridSubjectPrefix')]"
+              },
+              {
+                "name": "EventGridClientOptions__ApiEndpoint",
+                "value": "[parameters('EventGridPublishClientOptionsApiEndpoint')]"
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[variables('functionAppInsightsName')]",
+        "[variables('appServicePlanName')]"
+      ]
+    },
+    {
+      "name": "[variables('CosmosDbDatabaseName')]",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[parameters('CosmosDbResourceGroup')]",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('BuildingBlocksDfcBaseUrl'),'CosmosDb/cosmos-database.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "accountName": {
+            "value": "[parameters('CosmosDbName')]"
+          },
+          "databaseName": {
+            "value": "[variables('CosmosDbDatabaseName')]"
+          },
+          "useSharedRequestUnits": {
+            "value": true
+          },
+          "offerThroughput": {
+            "value": "[parameters('lmideltaReportAppDatabaseThroughput')]"
+          },
+          "databaseNeedsCreation": {
+            "value": "[parameters('lmiDeltaReportAppDatabaseNeedsCreation')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "[parameters('cosmosDeltaReportsCollectionName')]",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[parameters('CosmosDbResourceGroup')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('BuildingBlocksDfcBaseUrl'), 'CosmosDb/cosmos-collection.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "accountName": {
+            "value": "[parameters('cosmosDbName')]"
+          },
+          "databaseName": {
+            "value": "[variables('cosmosDbDatabaseName')]"
+          },
+          "collectionName": {
+            "value": "[parameters('cosmosDeltaReportsCollectionName')]"
+          },
+          "provisionRequestUnits": {
+            "value": false
+          },
+          "partitionKey": {
+            "value": "[variables('cosmosDbCollectionPartitionKey')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[variables('CosmosDbDatabaseName')]"
+      ]
+    },
+    {
+      "apiVersion": "2019-05-01",
+      "name": "[concat(variables('functionAppInsightsName'), '-metric-exceptions')]",
+      "type": "Microsoft.Resources/deployments",
+      "dependsOn": [
+        "[variables('functionAppInsightsName')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('BuildingBlocksDfcBaseUrl'), 'Application-Insights/metric-alerts.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "enabled": {
+            "value": "[parameters('enableAlerts')]"
+          },
+          "alertName": {
+            "value": "[concat(variables('functionAppInsightsName'), '-metric-exceptions')]"
+          },
+          "alertSeverity": {
+            "value": 3
+          },
+          "metricName": {
+            "value": "exceptions/count"
+          },
+          "operator": {
+            "value": "GreaterThan"
+          },
+          "threshold": {
+            "value": "[parameters('ExceptionCountThreshold')]"
+          },
+          "aggregation": {
+            "value": "Count"
+          },
+          "windowSize": {
+            "value": "PT5M"
+          },
+          "evaluationFrequency": {
+            "value": "PT1M"
+          },
+          "actionGroupName": {
+            "value": "[variables('ActionGroupName')]"
+          },
+          "actionGroupResourceGroup": {
+            "value": "[parameters('appSharedResourceGroup')]"
+          },
+          "resourceId": {
+            "value": "[resourceId('Microsoft.Insights/Components', variables('functionAppInsightsName'))]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2019-05-01",
+      "name": "[concat(variables('functionAppInsightsName'), '-failure-anomaly-v2')]",
+      "type": "Microsoft.Resources/deployments",
+      "dependsOn": [
+        "[variables('functionAppInsightsName')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('BuildingBlocksDfcBaseUrl'), 'Application-Insights/failure-anomaly-rule.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "alertName": {
+            "value": "[concat(variables('functionAppInsightsName'), '-failure-anomaly-v2')]"
+          },
+          "enabled": {
+            "value": "[parameters('enableAlerts')]"
+          },
+          "resourceId": {
+            "value": "[resourceId('Microsoft.Insights/Components', variables('functionAppInsightsName'))]"
+          },
+          "actionGroupId": {
+            "value": "[resourceId(parameters('appSharedResourceGroup'), 'microsoft.insights/actionGroups', variables('ActionGroupName'))]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2019-05-01",
+      "name": "[concat(variables('AppServicePlanName'), '-CPUPercentage')]",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('BuildingBlocksDfcBaseUrl'), 'Application-Insights/metric-alerts.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "enabled": {
+            "value": "[parameters('enableAlerts')]"
+          },
+          "alertName": {
+            "value": "[concat(variables('AppServicePlanName'), '-metric-CPUPercentage')]"
+          },
+          "alertSeverity": {
+            "value": 3
+          },
+          "metricName": {
+            "value": "CpuPercentage"
+          },
+          "operator": {
+            "value": "GreaterThanOrEqual"
+          },
+          "threshold": {
+            "value": "[parameters('CPUPercentageThreshold')]"
+          },
+          "aggregation": {
+            "value": "Average"
+          },
+          "windowSize": {
+            "value": "PT5M"
+          },
+          "evaluationFrequency": {
+            "value": "PT1M"
+          },
+          "actionGroupName": {
+            "value": "[variables('ActionGroupName')]"
+          },
+          "actionGroupResourceGroup": {
+            "value": "[parameters('appSharedResourceGroup')]"
+          },
+          "resourceId": {
+            "value": "[resourceId('Microsoft.Web/serverFarms', variables('AppServicePlanName'))]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[variables('AppServicePlanName')]"
+      ]
+    },
+    {
+      "apiVersion": "2019-05-01",
+      "name": "[concat(variables('AppServicePlanName'), '-MemoryPercentage')]",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('BuildingBlocksDfcBaseUrl'), 'Application-Insights/metric-alerts.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "enabled": {
+            "value": "[parameters('enableAlerts')]"
+          },
+          "alertName": {
+            "value": "[concat(variables('AppServicePlanName'), '-metric-MemoryPercentage')]"
+          },
+          "alertSeverity": {
+            "value": 3
+          },
+          "metricName": {
+            "value": "MemoryPercentage"
+          },
+          "operator": {
+            "value": "GreaterThanOrEqual"
+          },
+          "threshold": {
+            "value": "[parameters('MemoryPercentageThreshold')]"
+          },
+          "aggregation": {
+            "value": "Average"
+          },
+          "windowSize": {
+            "value": "PT5M"
+          },
+          "evaluationFrequency": {
+            "value": "PT1M"
+          },
+          "actionGroupName": {
+            "value": "[variables('ActionGroupName')]"
+          },
+          "actionGroupResourceGroup": {
+            "value": "[parameters('appSharedResourceGroup')]"
+          },
+          "resourceId": {
+            "value": "[resourceId('Microsoft.Web/serverFarms', variables('AppServicePlanName'))]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[variables('AppServicePlanName')]"
+      ]
+    }
+  ],
+  "outputs": {
+  }
+}

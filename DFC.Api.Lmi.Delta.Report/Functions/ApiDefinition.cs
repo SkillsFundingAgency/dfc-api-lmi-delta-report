@@ -10,6 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using SwaggerIgnoreAttribute = DFC.Swagger.Standard.Annotations.SwaggerIgnoreAttribute;
 
 namespace DFC.Api.Lmi.Delta.Report.Functions
 {
