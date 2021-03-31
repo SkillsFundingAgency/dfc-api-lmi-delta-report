@@ -114,7 +114,7 @@
     "appServicePlanName": "[concat(variables('resourcePrefix'), '-asp')]",
     "appServicePlanResourceGroup": "[concat(variables('resourcePrefix'),'-rg')]",
     "buildingBlocksDfcBaseUrl": "https://raw.githubusercontent.com/SkillsFundingAgency/dfc-devops/master/ArmTemplates/",
-    "resourcePrefix": "[tolower(concat('dfc-', tolower(parameters('Environment')), '-api-lmi-transformation'))]",
+    "resourcePrefix": "[tolower(concat('dfc-', tolower(parameters('Environment')), '-api-lmi-delta-report'))]",
     "cosmosDbCollectionPartitionKey": "/PartitionKey",
     "cosmosDbDatabaseName": "dfc-api-lmi-delta-report",
     "cosmosDbEndpoint": "[concat('https://', parameters('cosmosDbName'), '.documents.azure.com:443/')]",

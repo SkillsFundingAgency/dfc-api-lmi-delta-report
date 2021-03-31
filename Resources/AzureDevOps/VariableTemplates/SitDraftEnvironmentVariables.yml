@@ -2,7 +2,7 @@ variables:
 - name: ReleaseEnvironmentName
   value: SIT-DRAFT
 - name: WebAppPrefix
-  value: dfc-sit-draft-api-lmi-transformation
+  value: dfc-sit-draft-api-lmi-delta-reports
 - name: ResourceGroup
   value: $(WebAppPrefix)-rg
 - name: aspTier
@@ -24,7 +24,7 @@ variables:
 - name: cosmosDeltaReportsCollectionName
   value: delta-reports-draft
 - name: SubscriptionSettingsEndpoint
-  value: $(ApimProxyAddress)/LMI/Transformation-draft/lmi/webhook?subscription-key=$(apimLmiKey)
+  value: $(ApimProxyAddress)/LMI/delta-report-draft/lmi/webhook?subscription-key=$(apimLmiKey)
 - name: subscriptionUrl
   value: https://dfc-sit-api-eventgridsubscriptions-fa.$(FunctionAppDomain)/api/execute/
 - name: EventGridPublishClientOptionsApiEndpoint
@@ -34,7 +34,7 @@ variables:
 - name: FunctionAppName
   value: $(WebAppPrefix)-fa
 - name: ApplicationName
-  value: dfc-api-lmi-delta-report
+  value: dfc-api-lmi-delta-reports
 - name: apimLoggerName
   value: LMI-logger
 - name: apimProductName

@@ -73,7 +73,7 @@ steps:
   inputs:
     azureSubscription: '${{ parameters.AzureSubscription }}'
     ScriptPath: '$(Agent.BuildDirectory)/s/dfc-devops/PSCoreScripts/Set-ApimPolicy.ps1'
-    ScriptArguments: '-PolicyScope operation -ApimResourceGroup ${{ parameters.SharedResourceGroup }} -ApimServiceName ${{ parameters.ApimServiceName }} -PolicyFilePath "$(Agent.BuildDirectory)/dfc.api.lmi.transformation.apimpolicies/ApimPolicy-IsolatedAzureFunctionAsEventGridWebhookEndpoint.xml" -ApiId ${{ parameters.ApimProductName }}-${{ parameters.ApimApiName }} -OperationId LMIWebhook'
+    ScriptArguments: '-PolicyScope operation -ApimResourceGroup ${{ parameters.SharedResourceGroup }} -ApimServiceName ${{ parameters.ApimServiceName }} -PolicyFilePath "$(Agent.BuildDirectory)/dfc.api.lmi.delta.report.apimpolicies/ApimPolicy-IsolatedAzureFunctionAsEventGridWebhookEndpoint.xml" -ApiId ${{ parameters.ApimProductName }}-${{ parameters.ApimApiName }} -OperationId LMIWebhook'
     azurePowerShellVersion: LatestVersion
 
 - task: AzurePowerShell@5
