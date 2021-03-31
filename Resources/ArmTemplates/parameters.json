@@ -26,14 +26,14 @@
       "CosmosDbResourceGroup": {
           "value": "__appSharedResourceGroup__"
       },
-      "cosmosJobGroupDbCollectionName": {
-        "value": "__cosmosJobGroupDbCollectionName__"
+      "cosmosDeltaReportsCollectionName": {
+        "value": "__cosmosDeltaReportsCollectionName__"
       },
-      "lmiTransformationAppDatabaseNeedsCreation": {
+      "lmiDeltaReportAppDatabaseNeedsCreation": {
           "value": __CosmosDbDatabaseDoesntExist__
       },
-      "lmiTransformationAppDatabaseThroughput": {
-          "value": __lmiTransformationAppDatabaseThroughput__
+      "lmideltaReportAppDatabaseThroughput": {
+          "value": __lmideltaReportAppDatabaseThroughput__
       },
       "enableAlerts": {
           "value": __EnableAzureMonitorAlerting__
@@ -61,9 +61,6 @@
       },
       "CPUPercentageThreshold": {
           "value": "__CPUPercentageThreshold__"
-      },
-      "contentUrl": {
-        "value": "__contentUrl__"
       },
       "SubscriptionSettingsEndpoint": {
         "value": "__SubscriptionSettingsEndpoint__"
@@ -97,6 +94,12 @@
       },
       "apimResourceGroup": {
           "value": "__SharedResourceGroupName__"
+      },
+      "DraftJobGroupClientOptionsBaseAddress": {
+        "value": "__DraftJobGroupClientOptionsBaseAddress__"
+      },
+      "PublishedJobGroupClientOptionsBaseAddress": {
+        "value": "__PublishedJobGroupClientOptionsBaseAddress__"
       }
     }
   }

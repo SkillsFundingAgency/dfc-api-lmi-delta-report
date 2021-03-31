@@ -2,7 +2,7 @@ variables:
 - name: ReleaseEnvironmentName
   value: SIT
 - name: WebAppPrefix
-  value: dfc-sit-api-lmi-transformation
+  value: dfc-sit-api-lmi-delta-report
 - name: ResourceGroup
   value: $(WebAppPrefix)-rg
 - name: aspTier
@@ -11,7 +11,7 @@ variables:
   value: 2
 - name: aspSize
   value: 2
-- name: lmiTransformationAppDatabaseThroughput
+- name: lmideltaReportAppDatabaseThroughput
   value: 400
 - name: ExceptionCountThreshold
   value: 10
@@ -21,29 +21,31 @@ variables:
   value: 75
 - name: EnableAzureMonitorAlerting
   value: true
-- name: cosmosJobGroupDbCollectionName
-  value: job-groups
-- name: contentUrl
-  value: $(ContentApiAddress)/api/execute/
+- name: cosmosDeltaReportsCollectionName
+  value: delta-reports
 - name: SubscriptionSettingsEndpoint
   value: $(ApimProxyAddress)/LMI/Transformation/lmi/webhook?subscription-key=$(apimLmiKey)
 - name: subscriptionUrl
   value: https://dfc-sit-api-eventgridsubscriptions-fa.$(FunctionAppDomain)/api/execute/
 - name: EventGridPublishClientOptionsApiEndpoint
-  value: https://$(FunctionAppName).$(FunctionAppDomain)/job-groups
+  value: https://dfc-sit-app-jobgroups-as.$(FunctionAppDomain)/job-groups
 - name: EventGridSubjectPrefix
   value: /$(ApplicationName)/
 - name: FunctionAppName
   value: $(WebAppPrefix)-fa
 - name: ApplicationName
-  value: dfc-api-lmi-transformation
+  value: dfc-api-lmi-delta-report
 - name: apimLoggerName
   value: LMI-logger
 - name: apimProductName
   value: LMI
 - name: apimApiName
-  value: Transformation
+  value: Delta-Reports
 - name: SubscriptionPosturi
   value: https://$(FunctionAppName).$(FunctionAppDomain)/subscription/
 - name: FunctionAppUrl
   value: https://$(FunctionAppName).$(FunctionAppDomain)
+- name: DraftJobGroupClientOptionsBaseAddress
+  value: https://dfc-sit-draft-app-jobgroups-as.$(FunctionAppDomain)/api/job-groups/
+- name: PublishedJobGroupClientOptionsBaseAddress
+  value: https://dfc-sit-app-jobgroups-as.$(FunctionAppDomain)/api/job-groups/

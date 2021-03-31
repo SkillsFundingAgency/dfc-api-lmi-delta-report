@@ -26,10 +26,10 @@
       "CosmosDbResourceGroup": {
           "value": "dfc-dev-app-sharedresources-rg"
       },
-      "lmiTransformationAppDatabaseNeedsCreation": {
+      "lmiDeltaReportAppDatabaseNeedsCreation": {
           "value": true
       },
-      "lmiTransformationAppDatabaseThroughput": {
+      "lmideltaReportAppDatabaseThroughput": {
           "value": 2
       },
       "enableAlerts": {
@@ -38,8 +38,8 @@
       "cosmosDbName": {
         "value": "cosmosDB"
       },
-      "cosmosJobGroupDbCollectionName": {
-        "value": "cosmosJobGroupDbCollectionName"
+      "cosmosDeltaReportsCollectionName": {
+        "value": "cosmosDeltaReportsCollectionName"
       },
       "appSharedStorageAccountName": {
         "value": "dfcdevappsharedstr"
@@ -52,9 +52,6 @@
       },
       "CPUPercentageThreshold": {
           "value": "0"
-      },
-      "contentUrl": {
-        "value": "ContentUrl"
       },
       "SubscriptionSettingsEndpoint": {
         "value": "SubscriptionSettingsEndpoint"
@@ -88,6 +85,12 @@
       },
       "apimApiName": {
         "value": "api-name"
+      },
+      "DraftJobGroupClientOptionsBaseAddress": {
+        "value": "DraftJobGroupClientOptionsBaseAddress"
+      },
+      "PublishedJobGroupClientOptionsBaseAddress": {
+        "value": "PublishedJobGroupClientOptionsBaseAddress"
       }
     }
   }

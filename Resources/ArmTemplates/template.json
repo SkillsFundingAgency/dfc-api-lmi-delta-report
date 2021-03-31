@@ -40,10 +40,10 @@
     "cosmosDbKey": {
       "type": "securestring"
     },
-    "lmiTransformationAppDatabaseNeedsCreation": {
+    "lmiDeltaReportAppDatabaseNeedsCreation": {
       "type": "bool"
     },
-    "lmiTransformationAppDatabaseThroughput": {
+    "lmideltaReportAppDatabaseThroughput": {
       "type": "int"
     },
     "enableAlerts": {
@@ -66,9 +66,6 @@
       "metadata": {
         "description": "The name of the collection to create"
       }
-    },
-    "contentUrl": {
-      "type": "string"
     },
     "SubscriptionSettingsEndpoint": {
       "type": "string"
@@ -105,6 +102,12 @@
     },
     "apimResourceGroup": {
       "type": "string"
+    },
+    "DraftJobGroupClientOptionsBaseAddress": {
+      "type": "string"
+    },
+    "PublishedJobGroupClientOptionsBaseAddress": {
+      "type": "string"
     }
   },
   "variables": {
@@ -113,7 +116,7 @@
     "buildingBlocksDfcBaseUrl": "https://raw.githubusercontent.com/SkillsFundingAgency/dfc-devops/master/ArmTemplates/",
     "resourcePrefix": "[tolower(concat('dfc-', tolower(parameters('Environment')), '-api-lmi-transformation'))]",
     "cosmosDbCollectionPartitionKey": "/PartitionKey",
-    "cosmosDbDatabaseName": "dfc-api-lmi-transformation",
+    "cosmosDbDatabaseName": "dfc-api-lmi-delta-report",
     "cosmosDbEndpoint": "[concat('https://', parameters('cosmosDbName'), '.documents.azure.com:443/')]",
     "functionAppName": "[concat(variables('ResourcePrefix'), '-fa')]",
     "functionAppInsightsName": "[concat(variables('resourcePrefix'), '-ai')]",
@@ -309,36 +312,32 @@
                 "value": "[if(contains(variables('resourcePrefix'),'draft'),'(draft)','')]"
               },
               {
-                "name": "Configuration__CosmosDbConnections__LmiTransformation__AccessKey",
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReports__AccessKey",
                 "value": "[parameters('cosmosDbKey')]"
               },
               {
-                "name": "Configuration__CosmosDbConnections__LmiTransformation__EndpointUrl",
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReports__EndpointUrl",
                 "value": "[variables('cosmosDbEndpoint')]"
               },
               {
-                "name": "Configuration__CosmosDbConnections__LmiTransformation__DatabaseId",
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReports__DatabaseId",
                 "value": "[variables('cosmosDbDatabaseName')]"
               },
               {
-                "name": "Configuration__CosmosDbConnections__LmiTransformation__CollectionId",
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReports__CollectionId",
                 "value": "[parameters('cosmosJobGroupDbCollectionName')]"
               },
               {
-                "name": "Configuration__CosmosDbConnections__LmiTransformation__PartitionKey",
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReports__PartitionKey",
                 "value": "[variables('cosmosDbCollectionPartitionKey')]"
               },
               {
-                "name": "CmsApiClientOptions__BaseAddress",
-                "value": "[parameters('contentUrl')]"
+                "name": "DraftJobGroupClientOptions__BaseAddress",
+                "value": "[parameters('DraftJobGroupClientOptionsBaseAddress')]"
               },
               {
-                "name": "CmsApiClientOptions__SummaryEndpoint",
-                "value": "lmisoc"
-              },
-              {
-                "name": "CmsApiClientOptions__TimeOut",
-                "value": "00:01:00"
+                "name": "PublishedJobGroupClientOptions__BaseAddress",
+                "value": "[parameters('PublishedJobGroupClientOptionsBaseAddress')]"
               },
               {
                 "name": "SubscriptionSettings__Endpoint",
@@ -354,27 +353,11 @@
               },
               {
                 "name": "SubscriptionSettings__Filter__BeginsWith",
-                "value": "/dfc-api-lmi-import/"
+                "value": "/dfc-app-jobgroups/"
               },
               {
                 "name": "SubscriptionSettings__Filter__IncludeEventTypes__0",
-                "value": "published"
-              },
-              {
-                "name": "SubscriptionSettings__Filter__IncludeEventTypes__1",
-                "value": "unpublished"
-              },
-              {
-                "name": "SubscriptionSettings__Filter__IncludeEventTypes__2",
-                "value": "deleted"
-              },
-              {
-                "name": "SubscriptionSettings__Filter__IncludeEventTypes__3",
-                "value": "[if(contains(variables('resourcePrefix'),'draft'),'draft','')]"
-              },
-              {
-                "name": "SubscriptionSettings__Filter__IncludeEventTypes__4",
-                "value": "[if(contains(variables('resourcePrefix'),'draft'),'draft-discarded','')]"
+                "value": "[if(contains(variables('resourcePrefix'),'draft'),'draft','published')]"
               },
               {
                 "name": "EventGridClientOptions__TopicKey",
@@ -423,10 +406,10 @@
             "value": true
           },
           "offerThroughput": {
-            "value": "[parameters('lmiTransformationAppDatabaseThroughput')]"
+            "value": "[parameters('lmideltaReportAppDatabaseThroughput')]"
           },
           "databaseNeedsCreation": {
-            "value": "[parameters('lmiTransformationAppDatabaseNeedsCreation')]"
+            "value": "[parameters('lmiDeltaReportAppDatabaseNeedsCreation')]"
           }
         }
       }
