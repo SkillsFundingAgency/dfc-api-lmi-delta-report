@@ -63,7 +63,7 @@ stages:
 
 - stage: DeployToDevLmiDeltaReports
   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-  displayName: Deploy to DEV_LMI_DELTAREPORTS
+  displayName: Deploy to DEV_LMI_DELTA_REPORTS
   variables:
   - group: dfc-shared-all
   - group: dfc-shared-dev
@@ -85,7 +85,51 @@ stages:
       DfCDevopsPath: '$(Agent.BuildDirectory)/s/dfc-devops'
       PackageFile:  "$(Pipeline.Workspace)/${{ variables.SolutionBaseName }}.DeploymentPackages/${{ variables.SolutionBaseName }}.zip"
       ArmTemplateFolder: "$(Pipeline.Workspace)/${{ variables.SolutionBaseName }}.Resources.ArmTemplates/"
-      EnvironmentName: DEV_LMI_DELTAREPORTS
+      EnvironmentName: DEV_LMI_DELTA_REPORTS
+      AppSharedResourceGroup: $(AppSharedResourceGroup)
+      appSharedCosmosDBName: $(appSharedCosmosDBName)
+      AppServiceName: '$(FunctionAppName)'
+      ApimLoggerName: "$(ApimLoggerName)"
+      ApimProductName: "$(ApimProductName)"
+      SharedResourceGroup: $(SharedResourceGroup)
+      ApimServiceName: $(ApimServiceName)
+      ApimProductInstanceName: $(ApimProductInstanceName)
+      FunctionAppDomain: $(FunctionAppDomain)
+      APIMPolicyPath: "$(Pipeline.Workspace)/${{ variables.SolutionBaseName }}.ApimPolicies/"
+      ApimImportScript: "$(Pipeline.Workspace)/${{ variables.SolutionBaseName }}.Scripts/Import-ApimOpenApiDefinitionFromFile.ps1"
+      SpecificationPath: "$(Pipeline.Workspace)/${{ variables.SolutionBaseName }}.OpenApiDocs"
+      ApimApiName: $(ApimApiName)
+      SubscriptionPosturi: '$(SubscriptionPosturi)'
+      Apis:
+        -
+          - azureFunctionName: '${{ variables.FunctionAppName }}'
+
+
+- stage: DeployToDevDraftLmiDeltaReports
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  displayName: Deploy to DEV_DRAFT_LMI_DELTA_REPORTS
+  variables:
+  - group: dfc-shared-all
+  - group: dfc-shared-dev
+  - group: dfc-app-shared-all
+  - group: dfc-app-shared-dev
+  - group: dfc-app-shared-registration
+  - group: dfc-stax-shared-dev
+  - group: dfc-compositeui-all
+  - template: VariableTemplates\DevDraftEnvironmentVariables.yml
+  
+  jobs:
+  - template: JobTemplates/deploy-environment.yml
+    parameters:
+      AzureSubscription: 'SFA-CDH-Dev/Test (962cae10-2950-412a-93e3-d8ae92b17896)'
+      EnvironmentTag: '$(EnvironmentTag)'
+      ParentBusiness: '$(ParentBusiness)'
+      ServiceOffering: '$(ServiceOffering)'
+      ResourceGroup: $(ResourceGroup)
+      DfCDevopsPath: '$(Agent.BuildDirectory)/s/dfc-devops'
+      PackageFile:  "$(Pipeline.Workspace)/${{ variables.SolutionBaseName }}.DeploymentPackages/${{ variables.SolutionBaseName }}.zip"
+      ArmTemplateFolder: "$(Pipeline.Workspace)/${{ variables.SolutionBaseName }}.Resources.ArmTemplates/"
+      EnvironmentName: DEV_DRAFT_LMI_DELTA_REPORTS
       AppSharedResourceGroup: $(AppSharedResourceGroup)
       appSharedCosmosDBName: $(appSharedCosmosDBName)
       AppServiceName: '$(FunctionAppName)'
