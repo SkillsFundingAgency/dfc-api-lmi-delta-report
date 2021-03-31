@@ -33,7 +33,7 @@ steps:
   inputs:
     azureSubscription: '${{ parameters.AzureSubscription }}'
     ScriptPath: "${{ parameters.DfCDevopsPath }}/PSCoreScripts/Test-CosmosDbDatabaseDoesntExist.ps1"
-    ScriptArguments: '-ResourceGroup ${{ parameters.AppSharedResourceGroup }} -CosmosDbAccountName ${{ parameters.appSharedCosmosDBName }} -DatabaseName dfc-api-lmi-transformation'
+    ScriptArguments: '-ResourceGroup ${{ parameters.AppSharedResourceGroup }} -CosmosDbAccountName ${{ parameters.appSharedCosmosDBName }} -DatabaseName dfc-api-lmi-delta-report'
     azurePowerShellVersion: LatestVersion
 
 - task: esfadevops.Tokenization.custom-build-task.Tokenization@0
