@@ -168,7 +168,7 @@ namespace DFC.Api.Lmi.Delta.Report.Services
 
         public async Task<HttpStatusCode> ReportAll()
         {
-            var deltaReportModel = await jobGroupDataService.GetAll().ConfigureAwait(false);
+            var deltaReportModel = await jobGroupDataService.GetAllAsync().ConfigureAwait(false);
 
             socDeltaService.DetermineDelta(deltaReportModel);
 
@@ -189,7 +189,7 @@ namespace DFC.Api.Lmi.Delta.Report.Services
         {
             _ = socId ?? throw new ArgumentNullException(nameof(socId));
 
-            var deltaReportModel = await jobGroupDataService.GetSoc(socId).ConfigureAwait(false);
+            var deltaReportModel = await jobGroupDataService.GetSocAsync(socId).ConfigureAwait(false);
 
             if (deltaReportModel == null)
             {

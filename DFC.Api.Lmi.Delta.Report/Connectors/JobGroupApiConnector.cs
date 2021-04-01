@@ -17,7 +17,7 @@ namespace DFC.Api.Lmi.Delta.Report.Connectors
         private readonly IApiDataConnector apiDataConnector;
         private readonly JobGroupClientOptions jobGroupClientOptions;
 
-        public JobGroupApiConnector(
+        protected JobGroupApiConnector(
             ILogger<JobGroupApiConnector> logger,
             HttpClient httpClient,
             IApiDataConnector apiDataConnector,

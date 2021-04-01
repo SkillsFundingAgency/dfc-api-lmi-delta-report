@@ -25,7 +25,7 @@ namespace DFC.Api.Lmi.Delta.Report.Services
             this.publishedJobGroupApiConnector = publishedJobGroupApiConnector;
         }
 
-        public async Task<DeltaReportModel> GetAll()
+        public async Task<DeltaReportModel> GetAllAsync()
         {
             logger.LogInformation("Loading SOC delta");
 
@@ -47,7 +47,7 @@ namespace DFC.Api.Lmi.Delta.Report.Services
             return deltaReportModel;
         }
 
-        public async Task<DeltaReportModel?> GetSoc(Guid? socId)
+        public async Task<DeltaReportModel?> GetSocAsync(Guid? socId)
         {
             _ = socId ?? throw new ArgumentNullException(nameof(socId));
 
