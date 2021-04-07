@@ -12,7 +12,6 @@ using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -34,7 +33,7 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
         private readonly IEventGridService fakeEventGridService = A.Fake<IEventGridService>();
         private readonly LmiWebhookReceiverService lmiWebhookReceiverService;
         private readonly PublishedJobGroupClientOptions publishedJobGroupClientOptions = new PublishedJobGroupClientOptions();
-        private readonly EventGridClientOptions eventGridClientOptions = new EventGridClientOptions();
+        private readonly EventGridClientOptions eventGridClientOptions = new EventGridClientOptions { ApiEndpoint = new Uri("https://somewhere.com", UriKind.Absolute) };
 
         public LmiWebhookReceiverServiceTests()
         {
@@ -342,7 +341,7 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
             // Arrange
 
             // Act
-            await lmiWebhookReceiverService.PostPublishedEventAsync("hello world").ConfigureAwait(false);
+            await lmiWebhookReceiverService.PostPublishedEventAsync("hello world", new Uri("https://somewhere.com", UriKind.Absolute)).ConfigureAwait(false);
 
             // Assert
             A.CallTo(() => fakeEventGridService.SendEventAsync(A<EventGridEventData>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
