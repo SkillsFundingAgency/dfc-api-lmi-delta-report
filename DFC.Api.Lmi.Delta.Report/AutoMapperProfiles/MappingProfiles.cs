@@ -1,4 +1,7 @@
 ﻿using AutoMapper;
+using DFC.Api.Lmi.Delta.Report.Models.ApiModels;
+using DFC.Api.Lmi.Delta.Report.Models.ReportModels;
+using Newtonsoft.Json;
 using System.Diagnostics.CodeAnalysis;
 
 namespace DFC.Api.Lmi.Delta.Report.AutoMapperProfiles
@@ -8,7 +11,15 @@ namespace DFC.Api.Lmi.Delta.Report.AutoMapperProfiles
     {
         public MappingProfiles()
         {
-            //      CreateMap<JobGroupModel, JobGroupSummaryItemModel>();
+            CreateMap<JobGroupModel, JobGroupToDeltaModel>();
+
+            CreateMap<DeltaReportModel, DeltaReportSummaryApiModel>();
+
+            CreateMap<DeltaReportModel, DeltaReportApiModel>();
+
+            CreateMap<DeltaReportSocModel, DeltaReportSocApiModel>()
+                .ForMember(d => d.DraftJobGroup, s => s.MapFrom(a => JsonConvert.SerializeObject(a.DraftJobGroup)))
+                .ForMember(d => d.PublishedJobGroup, s => s.MapFrom(a => JsonConvert.SerializeObject(a.PublishedJobGroup)));
         }
     }
 }

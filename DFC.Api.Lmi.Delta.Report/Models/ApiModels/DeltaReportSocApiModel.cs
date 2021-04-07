@@ -3,13 +3,13 @@
 namespace DFC.Api.Lmi.Delta.Report.Models.ReportModels
 {
     [ExcludeFromCodeCoverage]
-    public class DeltaReportSocModel
+    public class DeltaReportSocApiModel
     {
         public int Soc { get; set; }
 
-        public JobGroupModel? DraftJobGroup { get; set; }
+        public string? DraftJobGroup { get; set; }
 
-        public JobGroupModel? PublishedJobGroup { get; set; }
+        public string? PublishedJobGroup { get; set; }
 
         public string? Delta { get; set; }
     }

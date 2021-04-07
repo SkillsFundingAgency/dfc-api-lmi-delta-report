@@ -5,6 +5,6 @@ namespace DFC.Api.Lmi.Delta.Report.Contracts
 {
     public interface ISocDeltaService
     {
-        void DetermineDelta(DeltaReportModel deltaReportModel);
+        void DetermineDelta(DeltaReportModel? deltaReportModel);
     }
 }

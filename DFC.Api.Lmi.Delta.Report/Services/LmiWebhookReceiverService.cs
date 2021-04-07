@@ -178,7 +178,7 @@ namespace DFC.Api.Lmi.Delta.Report.Services
 
             if (result == HttpStatusCode.Created)
             {
-                await PostPublishedEventAsync($"Publish all SOCs to job-group app").ConfigureAwait(false);
+                await PostPublishedEventAsync($"Publish all SOCs to job-group app", eventGridClientOptions.ApiEndpoint).ConfigureAwait(false);
                 await PurgeOldReportsAsync().ConfigureAwait(false);
             }
 
@@ -204,7 +204,8 @@ namespace DFC.Api.Lmi.Delta.Report.Services
 
             if (result == HttpStatusCode.Created)
             {
-                await PostPublishedEventAsync($"Publish individual SOC {socId} to job-group app").ConfigureAwait(false);
+                var apiEndpoint = new Uri($"{eventGridClientOptions.ApiEndpoint}/{socId}", UriKind.Absolute);
+                await PostPublishedEventAsync($"Publish individual SOC {socId} to job-group app", apiEndpoint).ConfigureAwait(false);
                 await PurgeOldReportsAsync().ConfigureAwait(false);
             }
 
@@ -225,14 +226,14 @@ namespace DFC.Api.Lmi.Delta.Report.Services
             }
         }
 
-        public async Task PostPublishedEventAsync(string displayText)
+        public async Task PostPublishedEventAsync(string displayText, Uri? apiEndpoint)
         {
             logger.LogInformation($"Posting to event grid for: {displayText}");
 
             var eventGridEventData = new EventGridEventData
             {
                 ItemId = Guid.NewGuid().ToString(),
-                Api = eventGridClientOptions.ApiEndpoint?.ToString(),
+                Api = apiEndpoint?.ToString(),
                 DisplayText = displayText,
                 VersionId = Guid.NewGuid().ToString(),
                 Author = eventGridClientOptions.SubjectPrefix,
