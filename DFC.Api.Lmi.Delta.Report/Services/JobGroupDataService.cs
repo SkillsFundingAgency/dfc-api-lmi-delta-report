@@ -25,29 +25,35 @@ namespace DFC.Api.Lmi.Delta.Report.Services
             this.publishedJobGroupApiConnector = publishedJobGroupApiConnector;
         }
 
-        public async Task<DeltaReportModel> GetAllAsync()
+        public async Task<FullDeltaReportModel> GetAllAsync()
         {
             logger.LogInformation("Loading SOC delta");
 
-            var deltaReportModel = new DeltaReportModel { Id = Guid.NewGuid() };
+            var fullDeltaReportModel = new FullDeltaReportModel { Id = Guid.NewGuid() };
             var draftSummaries = await draftJobGroupApiConnector.GetSummaryAsync().ConfigureAwait(false) ?? new List<JobGroupSummaryItemModel>();
             var publishedSummaries = await publishedJobGroupApiConnector.GetSummaryAsync().ConfigureAwait(false) ?? new List<JobGroupSummaryItemModel>();
             var draftSocs = (from a in draftSummaries select a.Soc).ToList();
             var publishedSocs = (from a in publishedSummaries select a.Soc).ToList();
             var allSocs = draftSocs.Union(publishedSocs).Distinct().ToList();
 
-            deltaReportModel.DeltaReportSocs = (from soc in allSocs select new DeltaReportSocModel { Soc = soc, }).ToList();
+            fullDeltaReportModel.DeltaReportSocs = (from soc in allSocs select new DeltaReportSocModel { Soc = soc, }).ToList();
 
-            foreach (var deltaReportSocModel in deltaReportModel.DeltaReportSocs)
+            foreach (var deltaReportSocModel in fullDeltaReportModel.DeltaReportSocs)
             {
                 deltaReportSocModel.DraftJobGroup = await draftJobGroupApiConnector.GetDetailAsync(deltaReportSocModel.Soc).ConfigureAwait(false);
                 deltaReportSocModel.PublishedJobGroup = await publishedJobGroupApiConnector.GetDetailAsync(deltaReportSocModel.Soc).ConfigureAwait(false);
             }
 
-            return deltaReportModel;
+            fullDeltaReportModel.DeltaReportSocs.ForEach((f) =>
+            {
+                f.Id = Guid.NewGuid();
+                f.DeltaReportId = fullDeltaReportModel.Id;
+            });
+
+            return fullDeltaReportModel;
         }
 
-        public async Task<DeltaReportModel?> GetSocAsync(Guid? socId)
+        public async Task<FullDeltaReportModel?> GetSocAsync(Guid? socId)
         {
             _ = socId ?? throw new ArgumentNullException(nameof(socId));
 
@@ -67,13 +73,19 @@ namespace DFC.Api.Lmi.Delta.Report.Services
             deltaReportSocModel.PublishedJobGroup = await publishedJobGroupApiConnector.GetDetailAsync(deltaReportSocModel.DraftJobGroup.Soc).ConfigureAwait(false);
             deltaReportSocModel.Soc = deltaReportSocModel.DraftJobGroup.Soc;
 
-            var deltaReportModel = new DeltaReportModel
+            var fullDeltaReportModel = new FullDeltaReportModel
             {
                 Id = Guid.NewGuid(),
                 DeltaReportSocs = new List<DeltaReportSocModel> { deltaReportSocModel },
             };
 
-            return deltaReportModel;
+            fullDeltaReportModel.DeltaReportSocs.ForEach((f) =>
+            {
+                f.Id = Guid.NewGuid();
+                f.DeltaReportId = fullDeltaReportModel.Id;
+            });
+
+            return fullDeltaReportModel;
         }
     }
 }

@@ -15,6 +15,10 @@ namespace DFC.Api.Lmi.Delta.Report.AutoMapperProfiles
 
             CreateMap<DeltaReportModel, DeltaReportSummaryApiModel>();
 
+            CreateMap<FullDeltaReportModel, DeltaReportModel>();
+
+            CreateMap<DeltaReportModel, DeltaReportApiModel>();
+
             CreateMap<DeltaReportModel, DeltaReportApiModel>();
 
             CreateMap<DeltaReportSocModel, DeltaReportSocApiModel>()

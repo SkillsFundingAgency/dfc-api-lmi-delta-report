@@ -21,17 +21,17 @@ namespace DFC.Api.Lmi.Delta.Report.Services
             this.mapper = mapper;
         }
 
-        public void DetermineDelta(DeltaReportModel? deltaReportModel)
+        public void DetermineDelta(FullDeltaReportModel? fullDeltaReportModel)
         {
-            _ = deltaReportModel ?? throw new ArgumentNullException(nameof(deltaReportModel));
+            _ = fullDeltaReportModel ?? throw new ArgumentNullException(nameof(fullDeltaReportModel));
 
             logger.LogInformation("Identifying delta for report");
 
-            if (deltaReportModel.DeltaReportSocs != null && deltaReportModel.DeltaReportSocs.Any())
+            if (fullDeltaReportModel.DeltaReportSocs != null && fullDeltaReportModel.DeltaReportSocs.Any())
             {
                 var jdp = new JsonDiffPatch();
 
-                foreach (var deltaReportSoc in deltaReportModel.DeltaReportSocs)
+                foreach (var deltaReportSoc in fullDeltaReportModel.DeltaReportSocs)
                 {
                     var publishedJobGroupToDelta = mapper.Map<JobGroupToDeltaModel>(deltaReportSoc.PublishedJobGroup);
                     var draftJobGroupToDelta = mapper.Map<JobGroupToDeltaModel>(deltaReportSoc.DraftJobGroup);
@@ -46,9 +46,9 @@ namespace DFC.Api.Lmi.Delta.Report.Services
                 }
             }
 
-            deltaReportModel.SocDeltaCount = (from a in deltaReportModel.DeltaReportSocs where !string.IsNullOrWhiteSpace(a.Delta) select a.Delta).Count();
+            fullDeltaReportModel.SocDeltaCount = (from a in fullDeltaReportModel.DeltaReportSocs where !string.IsNullOrWhiteSpace(a.Delta) select a.Delta).Count();
 
-            logger.LogInformation($"Identified {deltaReportModel.SocDeltaCount} deltas for report");
+            logger.LogInformation($"Identified {fullDeltaReportModel.SocDeltaCount} deltas for report");
         }
     }
 }

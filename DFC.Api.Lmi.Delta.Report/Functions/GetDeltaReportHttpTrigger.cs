@@ -9,6 +9,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Threading.Tasks;
@@ -20,20 +21,23 @@ namespace DFC.Api.Lmi.Delta.Report.Functions
         private readonly ILogger<GetDeltaReportHttpTrigger> logger;
         private readonly IMapper mapper;
         private readonly IDocumentService<DeltaReportModel> deltaReportDocumentService;
+        private readonly IDocumentService<DeltaReportSocModel> deltaReportSocDocumentService;
 
         public GetDeltaReportHttpTrigger(
            ILogger<GetDeltaReportHttpTrigger> logger,
            IMapper mapper,
-           IDocumentService<DeltaReportModel> deltaReportDocumentService)
+           IDocumentService<DeltaReportModel> deltaReportDocumentService,
+           IDocumentService<DeltaReportSocModel> deltaReportSocDocumentService)
         {
             this.logger = logger;
             this.mapper = mapper;
             this.deltaReportDocumentService = deltaReportDocumentService;
+            this.deltaReportSocDocumentService = deltaReportSocDocumentService;
         }
 
         [FunctionName("DeltaReport")]
         [Display(Name = "Get a delta report", Description = "Retrieve a delta report.")]
-        [ProducesResponseType(typeof(DeltaReportSummaryApiModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(DeltaReportApiModel), (int)HttpStatusCode.OK)]
         [Response(HttpStatusCode = (int)HttpStatusCode.BadRequest, Description = "Invalid request data or wrong environment", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.InternalServerError, Description = "Internal error caught and logged", ShowSchema = false)]
         [Response(HttpStatusCode = (int)HttpStatusCode.Unauthorized, Description = "API key is unknown or invalid", ShowSchema = false)]
@@ -51,6 +55,9 @@ namespace DFC.Api.Lmi.Delta.Report.Functions
                 logger.LogInformation($"Returning delta report for id: {id}");
 
                 var result = mapper.Map<DeltaReportApiModel>(deltaReportModel);
+                var deltaReportSocModels = await deltaReportSocDocumentService.GetAsync(w => w.DeltaReportId == id).ConfigureAwait(false);
+
+                result.DeltaReportSocs = mapper.Map<List<DeltaReportSocApiModel>>(deltaReportSocModels);
 
                 return new OkObjectResult(result);
             }

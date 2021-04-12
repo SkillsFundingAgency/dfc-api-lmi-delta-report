@@ -6,8 +6,8 @@ namespace DFC.Api.Lmi.Delta.Report.Contracts
 {
     public interface IJobGroupDataService
     {
-        Task<DeltaReportModel> GetAllAsync();
+        Task<FullDeltaReportModel> GetAllAsync();
 
-        Task<DeltaReportModel?> GetSocAsync(Guid? socId);
+        Task<FullDeltaReportModel?> GetSocAsync(Guid? socId);
     }
 }
