@@ -29,6 +29,9 @@
       "cosmosDeltaReportsCollectionName": {
         "value": "__cosmosDeltaReportsCollectionName__"
       },
+      "cosmosDeltaReportSocsCollectionName": {
+        "value": "__cosmosDeltaReportSocsCollectionName__"
+      },
       "lmiDeltaReportAppDatabaseNeedsCreation": {
           "value": __CosmosDbDatabaseDoesntExist__
       },
