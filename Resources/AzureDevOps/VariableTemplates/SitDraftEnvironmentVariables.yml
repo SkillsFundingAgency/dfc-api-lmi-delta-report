@@ -23,6 +23,8 @@ variables:
   value: true
 - name: cosmosDeltaReportsCollectionName
   value: delta-reports-draft
+- name: cosmosDeltaReportSocsCollectionName
+  value: delta-report-socs-draft
 - name: SubscriptionSettingsEndpoint
   value: $(ApimProxyAddress)/LMI/delta-reports-draft/lmi/webhook?subscription-key=$(apimLmiKey)
 - name: subscriptionUrl
