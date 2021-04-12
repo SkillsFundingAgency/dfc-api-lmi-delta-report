@@ -18,8 +18,6 @@ namespace DFC.Api.Lmi.Delta.Report.Models.ReportModels
 
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
-        public List<DeltaReportSocModel>? DeltaReportSocs { get; set; }
-
         public int SocDeltaCount { get; set; }
     }
 }

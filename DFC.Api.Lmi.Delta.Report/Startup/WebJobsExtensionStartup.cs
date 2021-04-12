@@ -30,6 +30,7 @@ namespace DFC.Api.Lmi.Delta.Report.Startup
     {
         private const string AppSettingsPolicies = "Policies";
         private const string CosmosDbLmiDeltaReportConfigAppSettings = "Configuration:CosmosDbConnections:LmiDeltaReports";
+        private const string CosmosDbLmiDeltaReportSocConfigAppSettings = "Configuration:CosmosDbConnections:LmiDeltaReportSocs";
 
         public void Configure(IWebJobsBuilder builder)
         {
@@ -41,7 +42,8 @@ namespace DFC.Api.Lmi.Delta.Report.Startup
                 .AddEnvironmentVariables()
                 .Build();
 
-            var cosmosDbConnection = configuration.GetSection(CosmosDbLmiDeltaReportConfigAppSettings).Get<CosmosDbConnection>();
+            var cosmosDbDeltaReportConnection = configuration.GetSection(CosmosDbLmiDeltaReportConfigAppSettings).Get<CosmosDbConnection>();
+            var cosmosDbDeltaReportSocConnection = configuration.GetSection(CosmosDbLmiDeltaReportSocConfigAppSettings).Get<CosmosDbConnection>();
 
             builder.Services.AddSingleton(configuration.GetSection(nameof(EventGridClientOptions)).Get<EventGridClientOptions>() ?? new EventGridClientOptions());
 
@@ -49,7 +51,8 @@ namespace DFC.Api.Lmi.Delta.Report.Startup
             builder.Services.AddHttpClient();
             builder.Services.AddApplicationInsightsTelemetry();
             builder.Services.AddAutoMapper(typeof(WebJobsExtensionStartup).Assembly);
-            builder.Services.AddDocumentServices<DeltaReportModel>(cosmosDbConnection, false);
+            builder.Services.AddDocumentServices<DeltaReportModel>(cosmosDbDeltaReportConnection, false);
+            builder.Services.AddDocumentServices<DeltaReportSocModel>(cosmosDbDeltaReportSocConnection, false);
             builder.Services.AddSubscriptionService(configuration);
             builder.Services.AddSingleton(new EnvironmentValues());
             builder.Services.AddTransient<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();

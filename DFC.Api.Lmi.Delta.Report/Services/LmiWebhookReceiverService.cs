@@ -1,4 +1,5 @@
-﻿using DFC.Api.Lmi.Delta.Report.Common;
+﻿using AutoMapper;
+using DFC.Api.Lmi.Delta.Report.Common;
 using DFC.Api.Lmi.Delta.Report.Contracts;
 using DFC.Api.Lmi.Delta.Report.Enums;
 using DFC.Api.Lmi.Delta.Report.Models;
@@ -33,7 +34,9 @@ namespace DFC.Api.Lmi.Delta.Report.Services
         };
 
         private readonly ILogger<LmiWebhookReceiverService> logger;
+        private readonly IMapper mapper;
         private readonly IDocumentService<DeltaReportModel> deltaReportDocumentService;
+        private readonly IDocumentService<DeltaReportSocModel> deltaReportSocDocumentService;
         private readonly IJobGroupDataService jobGroupDataService;
         private readonly ISocDeltaService socDeltaService;
         private readonly IEventGridService eventGridService;
@@ -42,7 +45,9 @@ namespace DFC.Api.Lmi.Delta.Report.Services
 
         public LmiWebhookReceiverService(
             ILogger<LmiWebhookReceiverService> logger,
+            IMapper mapper,
             IDocumentService<DeltaReportModel> deltaReportDocumentService,
+            IDocumentService<DeltaReportSocModel> deltaReportSocDocumentService,
             IJobGroupDataService jobGroupDataService,
             ISocDeltaService socDeltaService,
             IEventGridService eventGridService,
@@ -50,7 +55,9 @@ namespace DFC.Api.Lmi.Delta.Report.Services
             EventGridClientOptions eventGridClientOptions)
         {
             this.logger = logger;
+            this.mapper = mapper;
             this.deltaReportDocumentService = deltaReportDocumentService;
+            this.deltaReportSocDocumentService = deltaReportSocDocumentService;
             this.jobGroupDataService = jobGroupDataService;
             this.socDeltaService = socDeltaService;
             this.eventGridService = eventGridService;
@@ -168,18 +175,24 @@ namespace DFC.Api.Lmi.Delta.Report.Services
 
         public async Task<HttpStatusCode> ReportAll()
         {
-            var deltaReportModel = await jobGroupDataService.GetAllAsync().ConfigureAwait(false);
+            var fullDeltaReportModel = await jobGroupDataService.GetAllAsync().ConfigureAwait(false);
 
-            socDeltaService.DetermineDelta(deltaReportModel);
+            socDeltaService.DetermineDelta(fullDeltaReportModel);
 
             logger.LogInformation("Saving SOC delta report");
 
+            var deltaReportModel = mapper.Map<DeltaReportModel>(fullDeltaReportModel);
             var result = await deltaReportDocumentService.UpsertAsync(deltaReportModel).ConfigureAwait(false);
 
             if (result == HttpStatusCode.Created)
             {
-                await PostPublishedEventAsync($"Publish all SOCs to job-group app", eventGridClientOptions.ApiEndpoint).ConfigureAwait(false);
-                await PurgeOldReportsAsync().ConfigureAwait(false);
+                result = await SaveDeltaReportSocs(fullDeltaReportModel.DeltaReportSocs).ConfigureAwait(false);
+
+                if (result == HttpStatusCode.Created)
+                {
+                    await PostPublishedEventAsync($"Publish all SOCs to job-group app", eventGridClientOptions.ApiEndpoint).ConfigureAwait(false);
+                    await PurgeOldReportsAsync().ConfigureAwait(false);
+                }
             }
 
             return result;
@@ -189,24 +202,30 @@ namespace DFC.Api.Lmi.Delta.Report.Services
         {
             _ = socId ?? throw new ArgumentNullException(nameof(socId));
 
-            var deltaReportModel = await jobGroupDataService.GetSocAsync(socId).ConfigureAwait(false);
+            var fullDeltaReportModel = await jobGroupDataService.GetSocAsync(socId).ConfigureAwait(false);
 
-            if (deltaReportModel == null)
+            if (fullDeltaReportModel == null)
             {
                 return HttpStatusCode.NotFound;
             }
 
-            socDeltaService.DetermineDelta(deltaReportModel);
+            socDeltaService.DetermineDelta(fullDeltaReportModel);
 
             logger.LogInformation($"Saving individual SOC delta report for: {socId}");
 
+            var deltaReportModel = mapper.Map<DeltaReportModel>(fullDeltaReportModel);
             var result = await deltaReportDocumentService.UpsertAsync(deltaReportModel).ConfigureAwait(false);
 
             if (result == HttpStatusCode.Created)
             {
-                var apiEndpoint = new Uri($"{eventGridClientOptions.ApiEndpoint}/{socId}", UriKind.Absolute);
-                await PostPublishedEventAsync($"Publish individual SOC {socId} to job-group app", apiEndpoint).ConfigureAwait(false);
-                await PurgeOldReportsAsync().ConfigureAwait(false);
+                result = await SaveDeltaReportSocs(fullDeltaReportModel.DeltaReportSocs).ConfigureAwait(false);
+
+                if (result == HttpStatusCode.Created)
+                {
+                    var apiEndpoint = new Uri($"{eventGridClientOptions.ApiEndpoint}/{socId}", UriKind.Absolute);
+                    await PostPublishedEventAsync($"Publish individual SOC {socId} to job-group app", apiEndpoint).ConfigureAwait(false);
+                    await PurgeOldReportsAsync().ConfigureAwait(false);
+                }
             }
 
             return result;
@@ -222,8 +241,40 @@ namespace DFC.Api.Lmi.Delta.Report.Services
             foreach (var deltaReport in purgeDeltaReports)
             {
                 logger.LogInformation($"Purging old delta report: {deltaReport.CreatedDate.ToString("O", CultureInfo.InvariantCulture)} - {deltaReport.Id}");
-                await deltaReportDocumentService.DeleteAsync(deltaReport.Id).ConfigureAwait(false);
+                if (await deltaReportDocumentService.DeleteAsync(deltaReport.Id).ConfigureAwait(false))
+                {
+                    logger.LogInformation($"Purging old delta soc reports: {deltaReport.CreatedDate.ToString("O", CultureInfo.InvariantCulture)} - {deltaReport.Id}");
+                    var allDeltaSocReports = await deltaReportSocDocumentService.GetAsync(w => w.DeltaReportId == deltaReport.Id).ConfigureAwait(false);
+
+                    if (allDeltaSocReports != null && allDeltaSocReports.Any())
+                    {
+                        foreach (var deltaSocReport in allDeltaSocReports)
+                        {
+                            await deltaReportSocDocumentService.DeleteAsync(deltaSocReport.Id).ConfigureAwait(false);
+                        }
+                    }
+                }
             }
+        }
+
+        public async Task<HttpStatusCode> SaveDeltaReportSocs(List<DeltaReportSocModel>? deltaReportSocs)
+        {
+            if (deltaReportSocs != null && deltaReportSocs.Any())
+            {
+                foreach (var deltaReportSoc in deltaReportSocs)
+                {
+                    var result = await deltaReportSocDocumentService.UpsertAsync(deltaReportSoc).ConfigureAwait(false);
+
+                    if (result != HttpStatusCode.Created)
+                    {
+                        return result;
+                    }
+                }
+
+                return HttpStatusCode.Created;
+            }
+
+            return HttpStatusCode.NoContent;
         }
 
         public async Task PostPublishedEventAsync(string displayText, Uri? apiEndpoint)

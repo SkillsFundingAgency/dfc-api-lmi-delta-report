@@ -1,10 +1,31 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using DFC.Compui.Cosmos.Contracts;
+using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DFC.Api.Lmi.Delta.Report.Models.ReportModels
 {
     [ExcludeFromCodeCoverage]
-    public class DeltaReportSocModel
+    public class DeltaReportSocModel : DocumentModel
     {
+        public override string? PartitionKey
+        {
+            get => DeltaReportId.ToString();
+
+            set
+            {
+                if (value == null)
+                {
+                    DeltaReportId = null;
+                }
+                else
+                {
+                    DeltaReportId = Guid.Parse(value);
+                }
+            }
+        }
+
+        public Guid? DeltaReportId { get; set; }
+
         public int Soc { get; set; }
 
         public JobGroupModel? DraftJobGroup { get; set; }

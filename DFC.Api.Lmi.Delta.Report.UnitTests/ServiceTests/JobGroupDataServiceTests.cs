@@ -26,8 +26,8 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
         private readonly JobGroupModel dummyPublishedJobGroupModel03;
         private readonly JobGroupModel[] dummyDraftJobGroupModels;
         private readonly JobGroupModel[] dummyPublishedJobGroupModels;
-        private readonly DeltaReportModel expectedGetAllResult;
-        private readonly DeltaReportModel expectedGetSocResult;
+        private readonly FullDeltaReportModel expectedGetAllResult;
+        private readonly FullDeltaReportModel expectedGetSocResult;
 
         private readonly ILogger<JobGroupDataService> fakeLogger = A.Fake<ILogger<JobGroupDataService>>();
         private readonly IDraftJobGroupApiConnector fakeDraftJobGroupApiConnector = A.Fake<IDraftJobGroupApiConnector>();
@@ -78,7 +78,7 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
             };
             dummyDraftJobGroupModels = new[] { dummyDraftJobGroupModel01, dummyDraftJobGroupModel02 };
             dummyPublishedJobGroupModels = new[] { dummyPublishedJobGroupModel02, dummyPublishedJobGroupModel03 };
-            expectedGetAllResult = new DeltaReportModel
+            expectedGetAllResult = new FullDeltaReportModel
             {
                 DeltaReportSocs = new List<DeltaReportSocModel>
                 {
@@ -102,7 +102,7 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
                     },
                 },
             };
-            expectedGetSocResult = new DeltaReportModel
+            expectedGetSocResult = new FullDeltaReportModel
             {
                 DeltaReportSocs = new List<DeltaReportSocModel>
                 {

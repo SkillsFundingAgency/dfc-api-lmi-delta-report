@@ -1,4 +1,5 @@
-﻿using DFC.Api.Lmi.Delta.Report.Common;
+﻿using AutoMapper;
+using DFC.Api.Lmi.Delta.Report.Common;
 using DFC.Api.Lmi.Delta.Report.Contracts;
 using DFC.Api.Lmi.Delta.Report.Enums;
 using DFC.Api.Lmi.Delta.Report.Models;
@@ -14,6 +15,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
 using Xunit;
@@ -27,7 +29,9 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
         protected const string EventTypeDeleted = "deleted";
 
         private readonly ILogger<LmiWebhookReceiverService> fakeLogger = A.Fake<ILogger<LmiWebhookReceiverService>>();
+        private readonly IMapper fakeMapper = A.Fake<IMapper>();
         private readonly IDocumentService<DeltaReportModel> fakeDeltaReportDocumentService = A.Fake<IDocumentService<DeltaReportModel>>();
+        private readonly IDocumentService<DeltaReportSocModel> fakeDeltaReportSocDocumentService = A.Fake<IDocumentService<DeltaReportSocModel>>();
         private readonly IJobGroupDataService fakeJobGroupDataService = A.Fake<IJobGroupDataService>();
         private readonly ISocDeltaService fakeSocDeltaService = A.Fake<ISocDeltaService>();
         private readonly IEventGridService fakeEventGridService = A.Fake<IEventGridService>();
@@ -37,7 +41,7 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
 
         public LmiWebhookReceiverServiceTests()
         {
-            lmiWebhookReceiverService = new LmiWebhookReceiverService(fakeLogger, fakeDeltaReportDocumentService, fakeJobGroupDataService, fakeSocDeltaService, fakeEventGridService, publishedJobGroupClientOptions, eventGridClientOptions);
+            lmiWebhookReceiverService = new LmiWebhookReceiverService(fakeLogger, fakeMapper, fakeDeltaReportDocumentService, fakeDeltaReportSocDocumentService, fakeJobGroupDataService, fakeSocDeltaService, fakeEventGridService, publishedJobGroupClientOptions, eventGridClientOptions);
         }
 
         [Theory]
@@ -231,24 +235,31 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
         {
             // Arrange
             const HttpStatusCode expectedResult = HttpStatusCode.Created;
-            var dummyDeltaReportModel = A.Dummy<DeltaReportModel>();
+            var dummyFullDeltaReportModel = A.Dummy<FullDeltaReportModel>();
             var dummyDeltaReports = A.CollectionOfDummy<DeltaReportModel>(publishedJobGroupClientOptions.MaxReportsKept + 1);
-
-            A.CallTo(() => fakeJobGroupDataService.GetAllAsync()).Returns(dummyDeltaReportModel);
+            var dummyDeltaReportSocs = A.CollectionOfDummy<DeltaReportSocModel>(1);
+            dummyFullDeltaReportModel.DeltaReportSocs = A.CollectionOfFake<DeltaReportSocModel>(1).ToList();
+            A.CallTo(() => fakeJobGroupDataService.GetAllAsync()).Returns(dummyFullDeltaReportModel);
             A.CallTo(() => fakeDeltaReportDocumentService.UpsertAsync(A<DeltaReportModel>.Ignored)).Returns(HttpStatusCode.Created);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.UpsertAsync(A<DeltaReportSocModel>.Ignored)).Returns(HttpStatusCode.Created);
             A.CallTo(() => fakeDeltaReportDocumentService.GetAllAsync(A<string>.Ignored)).Returns(dummyDeltaReports);
             A.CallTo(() => fakeDeltaReportDocumentService.DeleteAsync(A<Guid>.Ignored)).Returns(true);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.GetAsync(A<Expression<Func<DeltaReportSocModel, bool>>>.Ignored)).Returns(dummyDeltaReportSocs);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.DeleteAsync(A<Guid>.Ignored)).Returns(true);
 
             // Act
             var result = await lmiWebhookReceiverService.ReportAll().ConfigureAwait(false);
 
             // Assert
             A.CallTo(() => fakeJobGroupDataService.GetAllAsync()).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeSocDeltaService.DetermineDelta(A<DeltaReportModel>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeSocDeltaService.DetermineDelta(A<FullDeltaReportModel>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeDeltaReportDocumentService.UpsertAsync(A<DeltaReportModel>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeDeltaReportSocDocumentService.UpsertAsync(A<DeltaReportSocModel>.Ignored)).MustHaveHappened(dummyFullDeltaReportModel.DeltaReportSocs!.Count, Times.Exactly);
             A.CallTo(() => fakeEventGridService.SendEventAsync(A<EventGridEventData>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeDeltaReportDocumentService.GetAllAsync(A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeDeltaReportDocumentService.DeleteAsync(A<Guid>.Ignored)).MustHaveHappened(dummyDeltaReports.Count - publishedJobGroupClientOptions.MaxReportsKept, Times.Exactly);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.GetAsync(A<Expression<Func<DeltaReportSocModel, bool>>>.Ignored)).MustHaveHappened(dummyDeltaReports.Count - publishedJobGroupClientOptions.MaxReportsKept, Times.Exactly);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.DeleteAsync(A<Guid>.Ignored)).MustHaveHappened((dummyDeltaReports.Count - publishedJobGroupClientOptions.MaxReportsKept) * dummyDeltaReportSocs.Count, Times.Exactly);
             Assert.Equal(expectedResult, result);
         }
 
@@ -257,24 +268,31 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
         {
             // Arrange
             const HttpStatusCode expectedResult = HttpStatusCode.Created;
-            var dummyDeltaReportModel = A.Dummy<DeltaReportModel>();
+            var dummyFullDeltaReportModel = A.Dummy<FullDeltaReportModel>();
             var dummyDeltaReports = A.CollectionOfDummy<DeltaReportModel>(publishedJobGroupClientOptions.MaxReportsKept + 1);
-
-            A.CallTo(() => fakeJobGroupDataService.GetSocAsync(A<Guid>.Ignored)).Returns(dummyDeltaReportModel);
+            var dummyDeltaReportSocs = A.CollectionOfDummy<DeltaReportSocModel>(1);
+            dummyFullDeltaReportModel.DeltaReportSocs = A.CollectionOfFake<DeltaReportSocModel>(1).ToList();
+            A.CallTo(() => fakeJobGroupDataService.GetSocAsync(A<Guid>.Ignored)).Returns(dummyFullDeltaReportModel);
             A.CallTo(() => fakeDeltaReportDocumentService.UpsertAsync(A<DeltaReportModel>.Ignored)).Returns(HttpStatusCode.Created);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.UpsertAsync(A<DeltaReportSocModel>.Ignored)).Returns(HttpStatusCode.Created);
             A.CallTo(() => fakeDeltaReportDocumentService.GetAllAsync(A<string>.Ignored)).Returns(dummyDeltaReports);
             A.CallTo(() => fakeDeltaReportDocumentService.DeleteAsync(A<Guid>.Ignored)).Returns(true);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.GetAsync(A<Expression<Func<DeltaReportSocModel, bool>>>.Ignored)).Returns(dummyDeltaReportSocs);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.DeleteAsync(A<Guid>.Ignored)).Returns(true);
 
             // Act
             var result = await lmiWebhookReceiverService.ReportSoc(Guid.NewGuid()).ConfigureAwait(false);
 
             // Assert
             A.CallTo(() => fakeJobGroupDataService.GetSocAsync(A<Guid>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeSocDeltaService.DetermineDelta(A<DeltaReportModel>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeSocDeltaService.DetermineDelta(A<FullDeltaReportModel>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeDeltaReportDocumentService.UpsertAsync(A<DeltaReportModel>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeDeltaReportSocDocumentService.UpsertAsync(A<DeltaReportSocModel>.Ignored)).MustHaveHappened(dummyFullDeltaReportModel.DeltaReportSocs!.Count, Times.Exactly);
             A.CallTo(() => fakeEventGridService.SendEventAsync(A<EventGridEventData>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeDeltaReportDocumentService.GetAllAsync(A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeDeltaReportDocumentService.DeleteAsync(A<Guid>.Ignored)).MustHaveHappened(dummyDeltaReports.Count - publishedJobGroupClientOptions.MaxReportsKept, Times.Exactly);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.GetAsync(A<Expression<Func<DeltaReportSocModel, bool>>>.Ignored)).MustHaveHappened(dummyDeltaReports.Count - publishedJobGroupClientOptions.MaxReportsKept, Times.Exactly);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.DeleteAsync(A<Guid>.Ignored)).MustHaveHappened((dummyDeltaReports.Count - publishedJobGroupClientOptions.MaxReportsKept) * dummyDeltaReportSocs.Count, Times.Exactly);
             Assert.Equal(expectedResult, result);
         }
 
@@ -288,11 +306,13 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
 
             // assert
             A.CallTo(() => fakeJobGroupDataService.GetSocAsync(A<Guid>.Ignored)).MustNotHaveHappened();
-            A.CallTo(() => fakeSocDeltaService.DetermineDelta(A<DeltaReportModel>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeSocDeltaService.DetermineDelta(A<FullDeltaReportModel>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeDeltaReportDocumentService.UpsertAsync(A<DeltaReportModel>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeEventGridService.SendEventAsync(A<EventGridEventData>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeDeltaReportDocumentService.GetAllAsync(A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeDeltaReportDocumentService.DeleteAsync(A<Guid>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeDeltaReportSocDocumentService.GetAllAsync(A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeDeltaReportSocDocumentService.DeleteAsync(A<Guid>.Ignored)).MustNotHaveHappened();
             Assert.Equal("Value cannot be null. (Parameter 'socId')", exceptionResult.Message);
         }
 
@@ -301,20 +321,22 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
         {
             // Arrange
             const HttpStatusCode expectedResult = HttpStatusCode.NotFound;
-            DeltaReportModel? nullDeltaReportModel = null;
+            FullDeltaReportModel? nullFullDeltaReportModel = null;
 
-            A.CallTo(() => fakeJobGroupDataService.GetSocAsync(A<Guid>.Ignored)).Returns(nullDeltaReportModel);
+            A.CallTo(() => fakeJobGroupDataService.GetSocAsync(A<Guid>.Ignored)).Returns(nullFullDeltaReportModel);
 
             // Act
             var result = await lmiWebhookReceiverService.ReportSoc(Guid.NewGuid()).ConfigureAwait(false);
 
             // Assert
             A.CallTo(() => fakeJobGroupDataService.GetSocAsync(A<Guid>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeSocDeltaService.DetermineDelta(A<DeltaReportModel>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeSocDeltaService.DetermineDelta(A<FullDeltaReportModel>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeDeltaReportDocumentService.UpsertAsync(A<DeltaReportModel>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeEventGridService.SendEventAsync(A<EventGridEventData>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeDeltaReportDocumentService.GetAllAsync(A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeDeltaReportDocumentService.DeleteAsync(A<Guid>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeDeltaReportSocDocumentService.GetAllAsync(A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => fakeDeltaReportSocDocumentService.DeleteAsync(A<Guid>.Ignored)).MustNotHaveHappened();
             Assert.Equal(expectedResult, result);
         }
 
@@ -323,9 +345,12 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
         {
             // Arrange
             var dummyDeltaReports = A.CollectionOfDummy<DeltaReportModel>(publishedJobGroupClientOptions.MaxReportsKept + 1);
+            var dummyDeltaReportSocs = A.CollectionOfDummy<DeltaReportSocModel>(1);
 
             A.CallTo(() => fakeDeltaReportDocumentService.GetAllAsync(A<string>.Ignored)).Returns(dummyDeltaReports);
             A.CallTo(() => fakeDeltaReportDocumentService.DeleteAsync(A<Guid>.Ignored)).Returns(true);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.GetAsync(A<Expression<Func<DeltaReportSocModel, bool>>>.Ignored)).Returns(dummyDeltaReportSocs);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.DeleteAsync(A<Guid>.Ignored)).Returns(true);
 
             // Act
             await lmiWebhookReceiverService.PurgeOldReportsAsync().ConfigureAwait(false);
@@ -333,6 +358,57 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
             // Assert
             A.CallTo(() => fakeDeltaReportDocumentService.GetAllAsync(A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeDeltaReportDocumentService.DeleteAsync(A<Guid>.Ignored)).MustHaveHappened(dummyDeltaReports.Count - publishedJobGroupClientOptions.MaxReportsKept, Times.Exactly);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.GetAsync(A<Expression<Func<DeltaReportSocModel, bool>>>.Ignored)).MustHaveHappened(dummyDeltaReports.Count - publishedJobGroupClientOptions.MaxReportsKept, Times.Exactly);
+            A.CallTo(() => fakeDeltaReportSocDocumentService.DeleteAsync(A<Guid>.Ignored)).MustHaveHappened((dummyDeltaReports.Count - publishedJobGroupClientOptions.MaxReportsKept) * dummyDeltaReportSocs.Count, Times.Exactly);
+        }
+
+        [Fact]
+        public async Task LmiWebhookReceiverServiceSaveDeltaReportSocsReturnsCreatedSuccessfully()
+        {
+            // Arrange
+            const HttpStatusCode expectedResult = HttpStatusCode.Created;
+            var dummyDeltaReportSocs = A.CollectionOfDummy<DeltaReportSocModel>(2).ToList();
+
+            A.CallTo(() => fakeDeltaReportSocDocumentService.UpsertAsync(A<DeltaReportSocModel>.Ignored)).Returns(HttpStatusCode.Created);
+
+            // Act
+            var result = await lmiWebhookReceiverService.SaveDeltaReportSocs(dummyDeltaReportSocs).ConfigureAwait(false);
+
+            // Assert
+            A.CallTo(() => fakeDeltaReportSocDocumentService.UpsertAsync(A<DeltaReportSocModel>.Ignored)).MustHaveHappened(dummyDeltaReportSocs.Count, Times.Exactly);
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public async Task LmiWebhookReceiverServiceSaveDeltaReportSocsReturnsNoContent()
+        {
+            // Arrange
+            const HttpStatusCode expectedResult = HttpStatusCode.NoContent;
+            var dummyDeltaReportSocs = A.CollectionOfDummy<DeltaReportSocModel>(0).ToList();
+
+            // Act
+            var result = await lmiWebhookReceiverService.SaveDeltaReportSocs(dummyDeltaReportSocs).ConfigureAwait(false);
+
+            // Assert
+            A.CallTo(() => fakeDeltaReportSocDocumentService.UpsertAsync(A<DeltaReportSocModel>.Ignored)).MustNotHaveHappened();
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public async Task LmiWebhookReceiverServiceSaveDeltaReportSocsReturnsBadRequest()
+        {
+            // Arrange
+            const HttpStatusCode expectedResult = HttpStatusCode.BadRequest;
+            var dummyDeltaReportSocs = A.CollectionOfDummy<DeltaReportSocModel>(1).ToList();
+
+            A.CallTo(() => fakeDeltaReportSocDocumentService.UpsertAsync(A<DeltaReportSocModel>.Ignored)).Returns(HttpStatusCode.BadRequest);
+
+            // Act
+            var result = await lmiWebhookReceiverService.SaveDeltaReportSocs(dummyDeltaReportSocs).ConfigureAwait(false);
+
+            // Assert
+            A.CallTo(() => fakeDeltaReportSocDocumentService.UpsertAsync(A<DeltaReportSocModel>.Ignored)).MustHaveHappened(dummyDeltaReportSocs.Count, Times.Exactly);
+            Assert.Equal(expectedResult, result);
         }
 
         [Fact]

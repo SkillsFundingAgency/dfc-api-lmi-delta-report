@@ -27,7 +27,7 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
         {
             // Arrange
             const int expectedSocDeltaCount = 1;
-            var deltaReportModel = new DeltaReportModel
+            var fullDeltaReportModel = new FullDeltaReportModel
             {
                 DeltaReportSocs = new List<DeltaReportSocModel>
                 {
@@ -53,16 +53,16 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
             {
                 Description = "this is the draft description",
             };
-            A.CallTo(() => fakeMapper.Map<JobGroupToDeltaModel>(deltaReportModel.DeltaReportSocs.First().PublishedJobGroup)).Returns(publishedJobGroupToDeltaModel);
-            A.CallTo(() => fakeMapper.Map<JobGroupToDeltaModel>(deltaReportModel.DeltaReportSocs.First().DraftJobGroup)).Returns(draftJobGroupToDelta);
+            A.CallTo(() => fakeMapper.Map<JobGroupToDeltaModel>(fullDeltaReportModel.DeltaReportSocs.First().PublishedJobGroup)).Returns(publishedJobGroupToDeltaModel);
+            A.CallTo(() => fakeMapper.Map<JobGroupToDeltaModel>(fullDeltaReportModel.DeltaReportSocs.First().DraftJobGroup)).Returns(draftJobGroupToDelta);
 
             // Act
-            socDeltaService.DetermineDelta(deltaReportModel);
+            socDeltaService.DetermineDelta(fullDeltaReportModel);
 
             // Assert
-            A.CallTo(() => fakeMapper.Map<JobGroupToDeltaModel>(deltaReportModel.DeltaReportSocs.First().PublishedJobGroup)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeMapper.Map<JobGroupToDeltaModel>(deltaReportModel.DeltaReportSocs.First().DraftJobGroup)).MustHaveHappenedOnceExactly();
-            Assert.Equal(expectedSocDeltaCount, deltaReportModel.SocDeltaCount);
+            A.CallTo(() => fakeMapper.Map<JobGroupToDeltaModel>(fullDeltaReportModel.DeltaReportSocs.First().PublishedJobGroup)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeMapper.Map<JobGroupToDeltaModel>(fullDeltaReportModel.DeltaReportSocs.First().DraftJobGroup)).MustHaveHappenedOnceExactly();
+            Assert.Equal(expectedSocDeltaCount, fullDeltaReportModel.SocDeltaCount);
         }
 
         [Fact]
@@ -74,7 +74,7 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
             var exceptionResult = Assert.Throws<ArgumentNullException>(() => socDeltaService.DetermineDelta(null));
 
             // assert
-            Assert.Equal("Value cannot be null. (Parameter 'deltaReportModel')", exceptionResult.Message);
+            Assert.Equal("Value cannot be null. (Parameter 'fullDeltaReportModel')", exceptionResult.Message);
         }
     }
 }
