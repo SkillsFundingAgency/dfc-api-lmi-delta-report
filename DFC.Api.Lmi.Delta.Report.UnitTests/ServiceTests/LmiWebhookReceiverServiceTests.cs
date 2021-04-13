@@ -47,8 +47,8 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
         [Theory]
         [InlineData(null, MessageContentType.None)]
         [InlineData("", MessageContentType.None)]
-        [InlineData("https://somewhere.com/api/" + Constants.ApiForJobGroups, MessageContentType.JobGroup)]
-        [InlineData("https://somewhere.com/api/" + Constants.ApiForJobGroups + "/", MessageContentType.JobGroupItem)]
+        [InlineData("https://somewhere.com/api/" + Constants.ApiForDeltaReport, MessageContentType.JobGroup)]
+        [InlineData("https://somewhere.com/api/" + Constants.ApiForDeltaReport + "/", MessageContentType.JobGroupItem)]
         public void LmiWebhookReceiverServiceDetermineMessageContentTypeReturnsExpected(string? apiEndpoint, MessageContentType expectedResult)
         {
             // Arrange
@@ -101,8 +101,8 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
         }
 
         [Theory]
-        [InlineData(EventTypePublished, WebhookCommand.ReportDeltaForAll, "https://somewhere.com/api/" + Constants.ApiForJobGroups)]
-        [InlineData(EventTypePublished, WebhookCommand.ReportDeltaForSoc, "https://somewhere.com/api/" + Constants.ApiForJobGroups + "/")]
+        [InlineData(EventTypePublished, WebhookCommand.ReportDeltaForAll, "https://somewhere.com/api/" + Constants.ApiForDeltaReport)]
+        [InlineData(EventTypePublished, WebhookCommand.ReportDeltaForSoc, "https://somewhere.com/api/" + Constants.ApiForDeltaReport + "/")]
         public void LmiWebhookReceiverServiceExtractEventReturnsExpected(string eventType, WebhookCommand webhookCommand, string api)
         {
             // Arrange
