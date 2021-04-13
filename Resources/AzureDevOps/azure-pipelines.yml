@@ -1,4 +1,4 @@
-name: r$(rev:r)-$(Release.DefinitionName)
+name: $(Rev:r)-$(Build.DefinitionName)
 
 variables:
     ArmTemplateRoot: "$(System.DefaultWorkingDirectory)/Resources/ArmTemplates"
