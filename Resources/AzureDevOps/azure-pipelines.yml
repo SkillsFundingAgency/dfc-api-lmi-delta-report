@@ -1,5 +1,3 @@
-name: $(Rev:.r)-$(Build.DefinitionName)
-
 variables:
     ArmTemplateRoot: "$(System.DefaultWorkingDirectory)/Resources/ArmTemplates"
     SolutionBaseName: 'DFC.Api.Lmi.Delta.Report'
