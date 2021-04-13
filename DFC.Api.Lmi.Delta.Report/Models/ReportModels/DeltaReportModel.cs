@@ -1,6 +1,5 @@
 ﻿using DFC.Compui.Cosmos.Contracts;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
@@ -18,6 +17,12 @@ namespace DFC.Api.Lmi.Delta.Report.Models.ReportModels
 
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
-        public int SocDeltaCount { get; set; }
+        public int SocImportedCount { get; set; }
+
+        public int SocUpdateCount { get; set; }
+
+        public int SocAdditionCount { get; set; }
+
+        public int SocDeletionCount { get; set; }
     }
 }

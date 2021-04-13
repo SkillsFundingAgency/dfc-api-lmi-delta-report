@@ -46,9 +46,15 @@ namespace DFC.Api.Lmi.Delta.Report.Services
                 }
             }
 
-            fullDeltaReportModel.SocDeltaCount = (from a in fullDeltaReportModel.DeltaReportSocs where !string.IsNullOrWhiteSpace(a.Delta) select a.Delta).Count();
+            fullDeltaReportModel.SocImportedCount = fullDeltaReportModel.DeltaReportSocs!.Count;
+            fullDeltaReportModel.SocAdditionCount = (from a in fullDeltaReportModel.DeltaReportSocs where a.DraftJobGroup != null && a.PublishedJobGroup == null select a).Count();
+            fullDeltaReportModel.SocUpdateCount = (from a in fullDeltaReportModel.DeltaReportSocs where a.DraftJobGroup != null && a.PublishedJobGroup != null && !string.IsNullOrWhiteSpace(a.Delta) select a).Count();
+            fullDeltaReportModel.SocDeletionCount = (from a in fullDeltaReportModel.DeltaReportSocs where a.DraftJobGroup == null && a.PublishedJobGroup != null select a).Count();
 
-            logger.LogInformation($"Identified {fullDeltaReportModel.SocDeltaCount} deltas for report");
+            logger.LogInformation($"Imported {fullDeltaReportModel.SocImportedCount} SOCs for report");
+            logger.LogInformation($"Identified {fullDeltaReportModel.SocAdditionCount} additions for report");
+            logger.LogInformation($"Identified {fullDeltaReportModel.SocUpdateCount} updates for report");
+            logger.LogInformation($"Identified {fullDeltaReportModel.SocDeletionCount} deletions for report");
         }
     }
 }

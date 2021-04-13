@@ -13,6 +13,12 @@ namespace DFC.Api.Lmi.Delta.Report.Models.ReportModels
 
         public List<DeltaReportSocModel>? DeltaReportSocs { get; set; }
 
-        public int SocDeltaCount { get; set; }
+        public int SocImportedCount { get; set; }
+
+        public int SocAdditionCount { get; set; }
+
+        public int SocUpdateCount { get; set; }
+
+        public int SocDeletionCount { get; set; }
     }
 }

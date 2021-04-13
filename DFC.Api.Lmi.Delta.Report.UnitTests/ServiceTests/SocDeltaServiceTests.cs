@@ -26,7 +26,9 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
         public void SocDeltaServiceTestsDetermineDeltaIsSuccessful()
         {
             // Arrange
-            const int expectedSocDeltaCount = 1;
+            const int expectedSocAdditionCount = 3;
+            const int expectedSocUpdateCount = 1;
+            const int expectedSocDeletionCount = 2;
             var fullDeltaReportModel = new FullDeltaReportModel
             {
                 DeltaReportSocs = new List<DeltaReportSocModel>
@@ -39,9 +41,39 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
                     },
                     new DeltaReportSocModel
                     {
-                        Soc = 4321,
+                        Soc = 1111,
+                        PublishedJobGroup = null,
+                        DraftJobGroup = new JobGroupModel(),
+                    },
+                    new DeltaReportSocModel
+                    {
+                        Soc = 1112,
+                        PublishedJobGroup = null,
+                        DraftJobGroup = new JobGroupModel(),
+                    },
+                    new DeltaReportSocModel
+                    {
+                        Soc = 1113,
+                        PublishedJobGroup = null,
+                        DraftJobGroup = new JobGroupModel(),
+                    },
+                    new DeltaReportSocModel
+                    {
+                        Soc = 2221,
                         PublishedJobGroup = new JobGroupModel(),
                         DraftJobGroup = new JobGroupModel(),
+                    },
+                    new DeltaReportSocModel
+                    {
+                        Soc = 3331,
+                        PublishedJobGroup = new JobGroupModel(),
+                        DraftJobGroup = null,
+                    },
+                    new DeltaReportSocModel
+                    {
+                        Soc = 3332,
+                        PublishedJobGroup = new JobGroupModel(),
+                        DraftJobGroup = null,
                     },
                 },
             };
@@ -62,7 +94,10 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
             // Assert
             A.CallTo(() => fakeMapper.Map<JobGroupToDeltaModel>(fullDeltaReportModel.DeltaReportSocs.First().PublishedJobGroup)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeMapper.Map<JobGroupToDeltaModel>(fullDeltaReportModel.DeltaReportSocs.First().DraftJobGroup)).MustHaveHappenedOnceExactly();
-            Assert.Equal(expectedSocDeltaCount, fullDeltaReportModel.SocDeltaCount);
+            Assert.Equal(fullDeltaReportModel.DeltaReportSocs.Count, fullDeltaReportModel.SocImportedCount);
+            Assert.Equal(expectedSocAdditionCount, fullDeltaReportModel.SocAdditionCount);
+            Assert.Equal(expectedSocUpdateCount, fullDeltaReportModel.SocUpdateCount);
+            Assert.Equal(expectedSocDeletionCount, fullDeltaReportModel.SocDeletionCount);
         }
 
         [Fact]
