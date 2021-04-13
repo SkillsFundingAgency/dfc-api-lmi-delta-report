@@ -67,6 +67,12 @@
         "description": "The name of the collection to create"
       }
     },
+    "cosmosDeltaReportSocsCollectionName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the collection to create"
+      }
+    },
     "SubscriptionSettingsEndpoint": {
       "type": "string"
     },
@@ -332,6 +338,26 @@
                 "value": "[variables('cosmosDbCollectionPartitionKey')]"
               },
               {
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReportSocs__AccessKey",
+                "value": "[parameters('cosmosDbKey')]"
+              },
+              {
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReportSocs__EndpointUrl",
+                "value": "[variables('cosmosDbEndpoint')]"
+              },
+              {
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReportSocs__DatabaseId",
+                "value": "[variables('cosmosDbDatabaseName')]"
+              },
+              {
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReportSocs__CollectionId",
+                "value": "[parameters('cosmosDeltaReportSocsCollectionName')]"
+              },
+              {
+                "name": "Configuration__CosmosDbConnections__LmiDeltaReportSocs__PartitionKey",
+                "value": "[variables('cosmosDbCollectionPartitionKey')]"
+              },
+              {
                 "name": "DraftJobGroupClientOptions__BaseAddress",
                 "value": "[parameters('DraftJobGroupClientOptionsBaseAddress')]"
               },
@@ -434,6 +460,39 @@
           },
           "collectionName": {
             "value": "[parameters('cosmosDeltaReportsCollectionName')]"
+          },
+          "provisionRequestUnits": {
+            "value": false
+          },
+          "partitionKey": {
+            "value": "[variables('cosmosDbCollectionPartitionKey')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[variables('CosmosDbDatabaseName')]"
+      ]
+    },
+    {
+      "apiVersion": "2017-05-10",
+      "name": "[parameters('cosmosDeltaReportSocsCollectionName')]",
+      "type": "Microsoft.Resources/deployments",
+      "resourceGroup": "[parameters('CosmosDbResourceGroup')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('BuildingBlocksDfcBaseUrl'), 'CosmosDb/cosmos-collection.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "accountName": {
+            "value": "[parameters('cosmosDbName')]"
+          },
+          "databaseName": {
+            "value": "[variables('cosmosDbDatabaseName')]"
+          },
+          "collectionName": {
+            "value": "[parameters('cosmosDeltaReportSocsCollectionName')]"
           },
           "provisionRequestUnits": {
             "value": false

@@ -41,6 +41,9 @@
       "cosmosDeltaReportsCollectionName": {
         "value": "cosmosDeltaReportsCollectionName"
       },
+      "cosmosDeltaReportSocsCollectionName": {
+        "value": "cosmosDeltaReportSocsCollectionName"
+      },
       "appSharedStorageAccountName": {
         "value": "dfcdevappsharedstr"
       },
