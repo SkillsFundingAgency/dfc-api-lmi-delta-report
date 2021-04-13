@@ -69,12 +69,12 @@ namespace DFC.Api.Lmi.Delta.Report.Services
         {
             if (!string.IsNullOrWhiteSpace(apiEndpoint))
             {
-                if (apiEndpoint.EndsWith($"/{Constants.ApiForJobGroups}", StringComparison.OrdinalIgnoreCase))
+                if (apiEndpoint.EndsWith($"/{Constants.ApiForDeltaReport}", StringComparison.OrdinalIgnoreCase))
                 {
                     return MessageContentType.JobGroup;
                 }
 
-                if (apiEndpoint.Contains($"/{Constants.ApiForJobGroups}/", StringComparison.OrdinalIgnoreCase))
+                if (apiEndpoint.Contains($"/{Constants.ApiForDeltaReport}/", StringComparison.OrdinalIgnoreCase))
                 {
                     return MessageContentType.JobGroupItem;
                 }
@@ -267,6 +267,7 @@ namespace DFC.Api.Lmi.Delta.Report.Services
 
                     if (result != HttpStatusCode.Created)
                     {
+                        logger.LogWarning($"Upsert of deltaReportSoc ({deltaReportSoc.Soc}) returned unexpected status code: {result}");
                         return result;
                     }
                 }

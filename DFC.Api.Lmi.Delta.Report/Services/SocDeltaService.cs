@@ -31,7 +31,7 @@ namespace DFC.Api.Lmi.Delta.Report.Services
             {
                 var jdp = new JsonDiffPatch();
 
-                foreach (var deltaReportSoc in fullDeltaReportModel.DeltaReportSocs)
+                foreach (var deltaReportSoc in fullDeltaReportModel.DeltaReportSocs.Where(w => w.PublishedJobGroup != null && w.DraftJobGroup != null))
                 {
                     var publishedJobGroupToDelta = mapper.Map<JobGroupToDeltaModel>(deltaReportSoc.PublishedJobGroup);
                     var draftJobGroupToDelta = mapper.Map<JobGroupToDeltaModel>(deltaReportSoc.DraftJobGroup);
