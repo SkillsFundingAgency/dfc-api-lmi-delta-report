@@ -12,6 +12,8 @@ namespace DFC.Api.Lmi.Delta.Report.Models.ApiModels
 
         public int SocImportedCount { get; set; }
 
+        public int SocUnchangedCount { get; set; }
+
         public int SocAdditionCount { get; set; }
 
         public int SocUpdateCount { get; set; }
