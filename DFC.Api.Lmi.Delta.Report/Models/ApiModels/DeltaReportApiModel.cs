@@ -7,7 +7,7 @@ namespace DFC.Api.Lmi.Delta.Report.Models.ReportModels
     [ExcludeFromCodeCoverage]
     public class DeltaReportApiModel
     {
-        public Guid? Ide { get; set; }
+        public Guid? Id { get; set; }
 
         public DateTime? CreatedDate { get; set; }
 
