@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DFC.Api.Lmi.Delta.Report.Common;
 using DFC.Api.Lmi.Delta.Report.Models.ReportModels;
 using DFC.Api.Lmi.Delta.Report.Services;
 using FakeItEasy;
@@ -36,42 +37,49 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.ServiceTests
                     new DeltaReportSocModel
                     {
                         Soc = 1234,
+                        State = DeltaReportState.Updated,
                         PublishedJobGroup = new JobGroupModel(),
                         DraftJobGroup = new JobGroupModel(),
                     },
                     new DeltaReportSocModel
                     {
                         Soc = 1111,
+                        State = DeltaReportState.Addition,
                         PublishedJobGroup = null,
                         DraftJobGroup = new JobGroupModel(),
                     },
                     new DeltaReportSocModel
                     {
                         Soc = 1112,
+                        State = DeltaReportState.Addition,
                         PublishedJobGroup = null,
                         DraftJobGroup = new JobGroupModel(),
                     },
                     new DeltaReportSocModel
                     {
                         Soc = 1113,
+                        State = DeltaReportState.Addition,
                         PublishedJobGroup = null,
                         DraftJobGroup = new JobGroupModel(),
                     },
                     new DeltaReportSocModel
                     {
                         Soc = 2221,
+                        State = DeltaReportState.Unchanged,
                         PublishedJobGroup = new JobGroupModel(),
                         DraftJobGroup = new JobGroupModel(),
                     },
                     new DeltaReportSocModel
                     {
                         Soc = 3331,
+                        State = DeltaReportState.Deletion,
                         PublishedJobGroup = new JobGroupModel(),
                         DraftJobGroup = null,
                     },
                     new DeltaReportSocModel
                     {
                         Soc = 3332,
+                        State = DeltaReportState.Deletion,
                         PublishedJobGroup = new JobGroupModel(),
                         DraftJobGroup = null,
                     },
