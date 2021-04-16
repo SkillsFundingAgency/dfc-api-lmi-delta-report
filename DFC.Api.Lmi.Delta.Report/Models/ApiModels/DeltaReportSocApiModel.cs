@@ -8,6 +8,8 @@ namespace DFC.Api.Lmi.Delta.Report.Models.ReportModels
     {
         public int Soc { get; set; }
 
+        public string? SocTitle { get; set; }
+
         public DeltaReportState State { get; set; }
 
         public string? Delta { get; set; }
