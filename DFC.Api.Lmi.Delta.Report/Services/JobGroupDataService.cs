@@ -87,6 +87,7 @@ namespace DFC.Api.Lmi.Delta.Report.Services
             {
                 f.Id = Guid.NewGuid();
                 f.DeltaReportId = id;
+                f.SocTitle = f.DraftJobGroup?.Title ?? f.PublishedJobGroup?.Title ?? "Unknown SOC title";
 
                 if (f.DraftJobGroup != null && f.PublishedJobGroup == null)
                 {
