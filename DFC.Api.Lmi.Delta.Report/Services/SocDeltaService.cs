@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DFC.Api.Lmi.Delta.Report.Common;
 using DFC.Api.Lmi.Delta.Report.Contracts;
 using DFC.Api.Lmi.Delta.Report.Models.ReportModels;
 using JsonDiffPatchDotNet;
@@ -42,14 +43,16 @@ namespace DFC.Api.Lmi.Delta.Report.Services
                     if (delta != null)
                     {
                         deltaReportSoc.Delta = delta.ToString();
+                        deltaReportSoc.State = DeltaReportState.Updated;
                     }
                 }
             }
 
             fullDeltaReportModel.SocImportedCount = fullDeltaReportModel.DeltaReportSocs!.Count;
-            fullDeltaReportModel.SocAdditionCount = (from a in fullDeltaReportModel.DeltaReportSocs where a.DraftJobGroup != null && a.PublishedJobGroup == null select a).Count();
-            fullDeltaReportModel.SocUpdateCount = (from a in fullDeltaReportModel.DeltaReportSocs where a.DraftJobGroup != null && a.PublishedJobGroup != null && !string.IsNullOrWhiteSpace(a.Delta) select a).Count();
-            fullDeltaReportModel.SocDeletionCount = (from a in fullDeltaReportModel.DeltaReportSocs where a.DraftJobGroup == null && a.PublishedJobGroup != null select a).Count();
+            fullDeltaReportModel.SocUnchangedCount = (from a in fullDeltaReportModel.DeltaReportSocs where a.State == DeltaReportState.Unchanged select a).Count();
+            fullDeltaReportModel.SocAdditionCount = (from a in fullDeltaReportModel.DeltaReportSocs where a.State == DeltaReportState.Addition select a).Count();
+            fullDeltaReportModel.SocUpdateCount = (from a in fullDeltaReportModel.DeltaReportSocs where a.State == DeltaReportState.Updated select a).Count();
+            fullDeltaReportModel.SocDeletionCount = (from a in fullDeltaReportModel.DeltaReportSocs where a.State == DeltaReportState.Deletion select a).Count();
 
             logger.LogInformation($"Imported {fullDeltaReportModel.SocImportedCount} SOCs for report");
             logger.LogInformation($"Identified {fullDeltaReportModel.SocAdditionCount} additions for report");

@@ -1,4 +1,5 @@
-﻿using DFC.Api.Lmi.Delta.Report.Contracts;
+﻿using DFC.Api.Lmi.Delta.Report.Common;
+using DFC.Api.Lmi.Delta.Report.Contracts;
 using DFC.Api.Lmi.Delta.Report.Models;
 using DFC.Api.Lmi.Delta.Report.Models.ReportModels;
 using Microsoft.Extensions.Logging;
@@ -44,11 +45,7 @@ namespace DFC.Api.Lmi.Delta.Report.Services
                 deltaReportSocModel.PublishedJobGroup = await publishedJobGroupApiConnector.GetDetailAsync(deltaReportSocModel.Soc).ConfigureAwait(false);
             }
 
-            fullDeltaReportModel.DeltaReportSocs.ForEach((f) =>
-            {
-                f.Id = Guid.NewGuid();
-                f.DeltaReportId = fullDeltaReportModel.Id;
-            });
+            SetState(fullDeltaReportModel.Id.Value, fullDeltaReportModel.DeltaReportSocs);
 
             return fullDeltaReportModel;
         }
@@ -79,13 +76,29 @@ namespace DFC.Api.Lmi.Delta.Report.Services
                 DeltaReportSocs = new List<DeltaReportSocModel> { deltaReportSocModel },
             };
 
-            fullDeltaReportModel.DeltaReportSocs.ForEach((f) =>
-            {
-                f.Id = Guid.NewGuid();
-                f.DeltaReportId = fullDeltaReportModel.Id;
-            });
+            SetState(fullDeltaReportModel.Id.Value, fullDeltaReportModel.DeltaReportSocs);
 
             return fullDeltaReportModel;
+        }
+
+        private static void SetState(Guid id, List<DeltaReportSocModel> deltaReportSocModels)
+        {
+            deltaReportSocModels.ForEach((f) =>
+            {
+                f.Id = Guid.NewGuid();
+                f.DeltaReportId = id;
+                f.SocTitle = f.DraftJobGroup?.Title ?? f.PublishedJobGroup?.Title ?? "Unknown SOC title";
+
+                if (f.DraftJobGroup != null && f.PublishedJobGroup == null)
+                {
+                    f.State = DeltaReportState.Addition;
+                }
+
+                if (f.DraftJobGroup == null && f.PublishedJobGroup != null)
+                {
+                    f.State = DeltaReportState.Deletion;
+                }
+            });
         }
     }
 }
