@@ -83,5 +83,4 @@ steps:
     ScriptType: InlineScript
     Inline: |
      Invoke-WebRequest -Uri ${{ parameters.SubscriptionPosturi }} -Method POST
-    errorActionPreference: continue
     azurePowerShellVersion: LatestVersion
