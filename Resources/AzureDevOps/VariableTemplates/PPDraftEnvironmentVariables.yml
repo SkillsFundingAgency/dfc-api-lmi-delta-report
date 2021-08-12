@@ -12,7 +12,7 @@ variables:
 - name: aspSize
   value: 1
 - name: lmideltaReportAppDatabaseThroughput
-  value: 400
+  value: 800
 - name: ExceptionCountThreshold
   value: 10
 - name: MemoryPercentageThreshold
