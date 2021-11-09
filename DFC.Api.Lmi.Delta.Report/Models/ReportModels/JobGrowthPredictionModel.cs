@@ -12,5 +12,9 @@ namespace DFC.Api.Lmi.Delta.Report.Models.ReportModels
         public decimal JobsCreated { get; set; }
 
         public decimal PercentageGrowth { get; set; }
+
+        public decimal? Retirements { get; set; }
+
+        public decimal? PercentageRetirements { get; set; }
     }
 }
