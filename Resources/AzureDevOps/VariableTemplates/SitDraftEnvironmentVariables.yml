@@ -30,7 +30,7 @@ variables:
 - name: subscriptionUrl
   value: https://dfc-sit-api-eventgridsubscriptions-fa.$(FunctionAppDomain)/api/execute/
 - name: EventGridPublishClientOptionsApiEndpoint
-  value: https://dfc-sit-draft-api-lmi-transformation-fa.$(FunctionAppDomain)/job-groups
+  value: https://dfc-sit-api-lmi-transformation-fa.$(FunctionAppDomain)/job-groups
 - name: EventGridSubjectPrefix
   value: /$(ApplicationName)/
 - name: FunctionAppName
