@@ -1,7 +1,6 @@
 ﻿using DFC.Api.Lmi.Delta.Report.Contracts;
 using DFC.Api.Lmi.Delta.Report.Enums;
 using DFC.Api.Lmi.Delta.Report.Functions;
-using DFC.Api.Lmi.Delta.Report.Models;
 using DFC.Api.Lmi.Delta.Report.Models.FunctionRequestModels;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
@@ -22,15 +21,13 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.FunctionTests
     {
         private readonly ILogger<LmiWebhookHttpTrigger> fakeLogger = A.Fake<ILogger<LmiWebhookHttpTrigger>>();
         private readonly ILmiWebhookReceiverService fakeLmiWebhookReceiverService = A.Fake<ILmiWebhookReceiverService>();
-        private readonly EnvironmentValues draftEnvironmentValues = new EnvironmentValues { EnvironmentNameApiSuffix = "(draft)" };
-        private readonly EnvironmentValues publishedEnvironmentValues = new EnvironmentValues { EnvironmentNameApiSuffix = string.Empty };
 
         [Fact]
         public async Task LmiWebhookHttpTriggerPostForSubscriptionValidationReturnsOk()
         {
             // Arrange
             var expectedResult = new StatusCodeResult((int)HttpStatusCode.OK);
-            var function = new LmiWebhookHttpTrigger(fakeLogger, draftEnvironmentValues, fakeLmiWebhookReceiverService);
+            var function = new LmiWebhookHttpTrigger(fakeLogger, fakeLmiWebhookReceiverService);
             var request = BuildRequestWithValidBody("a request body");
             var webhookRequestModel = new WebhookRequestModel
             {
@@ -53,11 +50,11 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.FunctionTests
         [Theory]
         [InlineData(WebhookCommand.ReportDeltaForAll, 1, 0)]
         [InlineData(WebhookCommand.ReportDeltaForSoc, 0, 1)]
-        public async Task LmiWebhookHttpTriggerPostForSubscriptionValidationReturnsExpectedResultCode(WebhookCommand webhookCommand, int forAllCount, int forSocCount)
+        public async Task LmiWebhookHttpTriggerPostForReportDeltaReturnsExpectedResultCode(WebhookCommand webhookCommand, int forAllCount, int forSocCount)
         {
             // Arrange
             var expectedResult = HttpStatusCode.Created;
-            var function = new LmiWebhookHttpTrigger(fakeLogger, draftEnvironmentValues, fakeLmiWebhookReceiverService);
+            var function = new LmiWebhookHttpTrigger(fakeLogger, fakeLmiWebhookReceiverService);
             var request = BuildRequestWithValidBody("a request body");
             var webhookRequestModel = new WebhookRequestModel
             {
@@ -80,39 +77,12 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.FunctionTests
             Assert.Equal((int)expectedResult, statusResult.StatusCode);
         }
 
-        [Theory]
-        [InlineData(WebhookCommand.ReportDeltaForAll)]
-        [InlineData(WebhookCommand.ReportDeltaForSoc)]
-        public async Task LmiWebhookHttpTriggerPostForSubscriptionValidationReturnsBadRequestForPublishedEnvironment(WebhookCommand webhookCommand)
-        {
-            // Arrange
-            var expectedResult = HttpStatusCode.BadRequest;
-            var function = new LmiWebhookHttpTrigger(fakeLogger, publishedEnvironmentValues, fakeLmiWebhookReceiverService);
-            var request = BuildRequestWithValidBody("a request body");
-            var webhookRequestModel = new WebhookRequestModel
-            {
-                WebhookCommand = webhookCommand,
-            };
-
-            A.CallTo(() => fakeLmiWebhookReceiverService.ExtractEvent(A<string>.Ignored)).Returns(webhookRequestModel);
-
-            // Act
-            var result = await function.Run(request).ConfigureAwait(false);
-
-            // Assert
-            A.CallTo(() => fakeLmiWebhookReceiverService.ExtractEvent(A<string>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeLmiWebhookReceiverService.ReportAll()).MustNotHaveHappened();
-            A.CallTo(() => fakeLmiWebhookReceiverService.ReportSoc(A<Guid>.Ignored)).MustNotHaveHappened();
-            var statusResult = Assert.IsType<BadRequestResult>(result);
-            Assert.Equal((int)expectedResult, statusResult.StatusCode);
-        }
-
         [Fact]
-        public async Task LmiWebhookHttpTriggerPostForSubscriptionValidationReturnsBadRequest()
+        public async Task LmiWebhookHttpTriggerPostForNoneReturnsBadRequest()
         {
             // Arrange
             var expectedResult = new StatusCodeResult((int)HttpStatusCode.BadRequest);
-            var function = new LmiWebhookHttpTrigger(fakeLogger, draftEnvironmentValues, fakeLmiWebhookReceiverService);
+            var function = new LmiWebhookHttpTrigger(fakeLogger, fakeLmiWebhookReceiverService);
             var request = BuildRequestWithValidBody("a request body");
             var webhookRequestModel = new WebhookRequestModel
             {
@@ -137,7 +107,7 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.FunctionTests
         {
             // Arrange
             var expectedResult = new StatusCodeResult((int)HttpStatusCode.BadRequest);
-            var function = new LmiWebhookHttpTrigger(fakeLogger, draftEnvironmentValues, fakeLmiWebhookReceiverService);
+            var function = new LmiWebhookHttpTrigger(fakeLogger, fakeLmiWebhookReceiverService);
             var request = BuildRequestWithValidBody(string.Empty);
 
             // Act
@@ -157,7 +127,7 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.FunctionTests
         {
             // Arrange
             var expectedResult = new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            var function = new LmiWebhookHttpTrigger(fakeLogger, draftEnvironmentValues, fakeLmiWebhookReceiverService);
+            var function = new LmiWebhookHttpTrigger(fakeLogger, fakeLmiWebhookReceiverService);
             var request = BuildRequestWithValidBody("a request body");
 
             A.CallTo(() => fakeLmiWebhookReceiverService.ExtractEvent(A<string>.Ignored)).Throws(new Exception());
