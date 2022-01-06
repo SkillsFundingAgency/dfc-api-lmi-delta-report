@@ -314,10 +314,6 @@
                 "value": "[reference(variables('functionAppInsightsName')).outputs.InstrumentationKey.value]"
               },
               {
-                "name": "ApiSuffix",
-                "value": "[if(contains(variables('resourcePrefix'),'draft'),'(draft)','')]"
-              },
-              {
                 "name": "Configuration__CosmosDbConnections__LmiDeltaReports__AccessKey",
                 "value": "[parameters('cosmosDbKey')]"
               },

@@ -30,7 +30,11 @@ variables:
 - name: subscriptionUrl
   value: https://dfc-lab-api-eventgridsubscriptions-fa.$(FunctionAppDomain)/api/execute/
 - name: EventGridPublishClientOptionsApiEndpoint
-  value: https://dfc-lab-draft-api-lmi-transformation-fa.$(FunctionAppDomain)/job-groups
+<<<<<<<< HEAD:Resources/AzureDevOps/VariableTemplates/LabEnvironmentVariables.yml
+  value: https://dfc-lab-api-lmi-transformation-fa.$(FunctionAppDomain)/job-groups
+========
+  value: https://dfc-sit-draft-api-lmi-transformation-fa.$(FunctionAppDomain)/job-groups
+>>>>>>>> origin/dev:Resources/AzureDevOps/VariableTemplates/SitDraftEnvironmentVariables.yml
 - name: EventGridSubjectPrefix
   value: /$(ApplicationName)/
 - name: FunctionAppName
