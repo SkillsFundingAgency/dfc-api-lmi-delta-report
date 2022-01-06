@@ -56,7 +56,6 @@ namespace DFC.Api.Lmi.Delta.Report.Startup
             builder.Services.AddDocumentServices<DeltaReportModel>(cosmosDbDeltaReportConnection, false, cosmosRetryOptions);
             builder.Services.AddDocumentServices<DeltaReportSocModel>(cosmosDbDeltaReportSocConnection, false, cosmosRetryOptions);
             builder.Services.AddSubscriptionService(configuration);
-            builder.Services.AddSingleton(new EnvironmentValues());
             builder.Services.AddTransient<ISwaggerDocumentGenerator, SwaggerDocumentGenerator>();
             builder.Services.AddTransient<ILmiWebhookReceiverService, LmiWebhookReceiverService>();
             builder.Services.AddTransient<IEventGridService, EventGridService>();

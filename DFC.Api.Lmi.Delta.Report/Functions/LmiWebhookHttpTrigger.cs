@@ -19,16 +19,13 @@ namespace DFC.Api.Lmi.Delta.Report.Functions
     public class LmiWebhookHttpTrigger
     {
         private readonly ILogger<LmiWebhookHttpTrigger> logger;
-        private readonly EnvironmentValues environmentValues;
         private readonly ILmiWebhookReceiverService lmiWebhookReceiverService;
 
         public LmiWebhookHttpTrigger(
            ILogger<LmiWebhookHttpTrigger> logger,
-           EnvironmentValues environmentValues,
            ILmiWebhookReceiverService lmiWebhookReceiverService)
         {
             this.logger = logger;
-            this.environmentValues = environmentValues;
             this.lmiWebhookReceiverService = lmiWebhookReceiverService;
 
             //TODO: ian: need to initialize the telemetry properly
@@ -70,18 +67,8 @@ namespace DFC.Api.Lmi.Delta.Report.Functions
                     case WebhookCommand.SubscriptionValidation:
                         return new OkObjectResult(webhookRequestModel.SubscriptionValidationResponse);
                     case WebhookCommand.ReportDeltaForAll:
-                        if (!environmentValues.IsDraftEnvironment)
-                        {
-                            return new BadRequestResult();
-                        }
-
                         return new StatusCodeResult((int)await lmiWebhookReceiverService.ReportAll().ConfigureAwait(false));
                     case WebhookCommand.ReportDeltaForSoc:
-                        if (!environmentValues.IsDraftEnvironment)
-                        {
-                            return new BadRequestResult();
-                        }
-
                         return new StatusCodeResult((int)await lmiWebhookReceiverService.ReportSoc(webhookRequestModel.ContentId).ConfigureAwait(false));
                     default:
                         return new BadRequestResult();
