@@ -106,7 +106,7 @@ stages:
 
 - stage: DeployToDevLmiDeltaReports
   dependsOn: Build
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
+  condition: succeeded()
   displayName: Deploy to DEV_LMI_DELTA_REPORTS
   variables:
   - group: dfc-shared-all
