@@ -4,6 +4,7 @@
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <ProjectGuid>{7E023F2F-27DE-4948-BDD9-C5D2AC679CB0}</ProjectGuid>
 	  <CodeAnalysisRuleSet>../DFC.Digital.CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+	  <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
 	  <Nullable>enable</Nullable>
   </PropertyGroup>
 	<ItemGroup>
@@ -13,7 +14,7 @@
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
 		<PackageReference Include="Azure.Messaging.EventGrid" Version="4.13.0" />
-		<PackageReference Include="AzureFunctions.Extensions.Swashbuckle" Version="1.4.5-preview5" />
+		<PackageReference Include="AzureExtensions.Swashbuckle" Version="3.3.2" />
 		<PackageReference Include="DFC.Compui.Cosmos" Version="1.0.67" />
 		<PackageReference Include="DFC.Compui.Subscriptions" Version="1.0.96" />
 		<PackageReference Include="DFC.Swagger.Standard" Version="0.1.27" />
