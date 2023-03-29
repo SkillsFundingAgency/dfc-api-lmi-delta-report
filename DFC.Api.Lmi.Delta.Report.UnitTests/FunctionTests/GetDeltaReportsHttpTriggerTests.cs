@@ -5,7 +5,6 @@ using DFC.Api.Lmi.Delta.Report.Models.ReportModels;
 using DFC.Compui.Cosmos.Contracts;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -68,10 +67,15 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.FunctionTests
 
         private static HttpRequest BuildRequestWithValidBody(string bodyString)
         {
-            return new DefaultHttpRequest(new DefaultHttpContext())
+            var context = new DefaultHttpContext
             {
-                Body = new MemoryStream(Encoding.UTF8.GetBytes(bodyString)),
+                Request =
+                {
+                    Body = new MemoryStream(Encoding.UTF8.GetBytes(bodyString)),
+                },
             };
+
+            return context.Request;
         }
     }
 }
