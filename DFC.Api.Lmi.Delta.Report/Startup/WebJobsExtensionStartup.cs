@@ -14,6 +14,7 @@ using DFC.Compui.Cosmos.Contracts;
 using DFC.Compui.Subscriptions.Pkg.Netstandard.Extensions;
 using DFC.Swagger.Standard;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -27,13 +28,13 @@ using System.Reflection;
 namespace DFC.Api.Lmi.Delta.Report.Startup
 {
     [ExcludeFromCodeCoverage]
-    public class WebJobsExtensionStartup : IWebJobsStartup
+    public class WebJobsExtensionStartup : FunctionsStartup
     {
         private const string AppSettingsPolicies = "Policies";
         private const string CosmosDbLmiDeltaReportConfigAppSettings = "Configuration:CosmosDbConnections:LmiDeltaReports";
         private const string CosmosDbLmiDeltaReportSocConfigAppSettings = "Configuration:CosmosDbConnections:LmiDeltaReportSocs";
 
-        public void Configure(IWebJobsBuilder builder)
+        public override void Configure(IFunctionsHostBuilder builder)
         {
             _ = builder ?? throw new ArgumentNullException(nameof(builder));
 
