@@ -15,7 +15,7 @@ namespace DFC.Api.Lmi.Delta.Report.Functions
         [Display(Name = "Health ping", Description = "Simple OK response to a health ping")]
         [Response(HttpStatusCode = (int)HttpStatusCode.OK, Description = "OK", ShowSchema = false)]
         public static IActionResult Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "health/ping")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "health/ping")] HttpRequest req, ILogger logger)
         {
              return new OkResult();
         }
