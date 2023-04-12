@@ -17,9 +17,7 @@ namespace DFC.Api.Lmi.Delta.Report.Functions
         public static IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "health/ping")] HttpRequest req, ILogger logger)
         {
-            logger.LogInformation($"pinged");
-
-            return new OkResult();
+             return new OkResult();
         }
     }
 }

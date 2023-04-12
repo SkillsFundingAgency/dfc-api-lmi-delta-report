@@ -4,9 +4,9 @@ using DFC.Api.Lmi.Delta.Report.Functions;
 using DFC.Api.Lmi.Delta.Report.Models.FunctionRequestModels;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Polly;
 using System;
 using System.IO;
 using System.Net;
@@ -146,10 +146,15 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.FunctionTests
 
         private static HttpRequest BuildRequestWithValidBody(string bodyString)
         {
-            return new DefaultHttpRequest(new DefaultHttpContext())
+            var context = new DefaultHttpContext
             {
-                Body = new MemoryStream(Encoding.UTF8.GetBytes(bodyString)),
+                Request =
+                {
+                    Body = new MemoryStream(Encoding.UTF8.GetBytes(bodyString)),
+                },
             };
+
+            return context.Request;
         }
     }
 }

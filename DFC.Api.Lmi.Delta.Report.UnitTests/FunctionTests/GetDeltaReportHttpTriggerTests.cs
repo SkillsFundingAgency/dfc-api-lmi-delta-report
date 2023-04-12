@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using DFC.Api.Lmi.Delta.Report.Functions;
 using DFC.Api.Lmi.Delta.Report.Models.ReportModels;
 using DFC.Compui.Cosmos.Contracts;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -77,10 +77,15 @@ namespace DFC.Api.Lmi.Delta.Report.UnitTests.FunctionTests
 
         private static HttpRequest BuildRequestWithValidBody(string bodyString)
         {
-            return new DefaultHttpRequest(new DefaultHttpContext())
+            var context = new DefaultHttpContext
             {
+                Request =
+                {
                 Body = new MemoryStream(Encoding.UTF8.GetBytes(bodyString)),
+                },
             };
+
+            return context.Request;
         }
     }
 }
