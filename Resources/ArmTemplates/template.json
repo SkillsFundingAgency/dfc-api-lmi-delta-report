@@ -2,6 +2,9 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "appInsightsName": {
+      "type": "string"
+    },
     "appSharedResourceGroup": {
       "type": "string"
     },
@@ -125,7 +128,7 @@
     "cosmosDbDatabaseName": "dfc-api-lmi-delta-report",
     "cosmosDbEndpoint": "[concat('https://', parameters('cosmosDbName'), '.documents.azure.com:443/')]",
     "functionAppName": "[concat(variables('ResourcePrefix'), '-fa')]",
-    "functionAppInsightsName": "[concat(variables('resourcePrefix'), '-ai')]",
+    "functionAppInsightsName": "[parameters('appInsightsName')]",
     "apimApiName": "[concat(parameters('apimProductName'), '-', parameters('apimApiName'))]",
     "ActionGroupName": "[concat('dfc-', replace(tolower(parameters('Environment')), '-draft', ''), '-app-sharedresources-actgrp')]"
   },

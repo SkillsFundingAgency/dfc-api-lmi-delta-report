@@ -103,6 +103,9 @@
       },
       "PublishedJobGroupClientOptionsBaseAddress": {
         "value": "__PublishedJobGroupClientOptionsBaseAddress__"
+      },
+      "appInsightsName": {
+          "value": "__appInsightsName__"
       }
     }
   }

@@ -94,6 +94,9 @@
       },
       "PublishedJobGroupClientOptionsBaseAddress": {
         "value": "PublishedJobGroupClientOptionsBaseAddress"
+      },
+      "appInsightsName": {
+          "value": "dfc-foo-shared-ai" 
       }
     }
   }
