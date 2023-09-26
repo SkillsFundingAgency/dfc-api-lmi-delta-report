@@ -148,7 +148,7 @@ stages:
           - azureFunctionName: '${{ variables.FunctionAppName }}'
 
 - stage: DeployToSitLmiDeltaReports
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
+  condition: succeeded()
   displayName: Deploy to SIT_LMI_DELTA_REPORTS
   variables:
   - group: dfc-shared-all
@@ -190,7 +190,7 @@ stages:
           - azureFunctionName: '${{ variables.FunctionAppName }}'
 
 - stage: DeployToPPLmiDeltaReports
-  condition: and(eq(dependencies.Build.result,'Succeeded'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: succeeded()
   displayName: Deploy to PP_LMI_DELTA_REPORTS
   variables:
   - group: dfc-shared-all
@@ -232,7 +232,7 @@ stages:
           - azureFunctionName: '${{ variables.FunctionAppName }}'
 
 - stage: DeployToPrdLmiDeltaReports
-  condition: and(eq(dependencies.DeployToPPLmiDeltaReports.result,'Succeeded'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: succeeded()
   displayName: Deploy to PRD_LMI_DELTA_REPORTS
   variables:
   - group: dfc-shared-all
