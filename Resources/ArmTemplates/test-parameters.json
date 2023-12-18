@@ -94,6 +94,12 @@
       },
       "PublishedJobGroupClientOptionsBaseAddress": {
         "value": "PublishedJobGroupClientOptionsBaseAddress"
+      },
+      "workspaceName": {
+          "value": "aTestLogAnalyticsAccount"
+      },
+      "workspaceResourceGroup": {
+          "value": "aResourceGroup"
       }
     }
   }
