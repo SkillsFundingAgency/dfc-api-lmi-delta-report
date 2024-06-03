@@ -5,14 +5,11 @@
       "appSharedResourceGroup": {
         "value": "dfc-dev-app-sharedresources-rg"
       },
-      "aspTier": {
-        "value": "Standard"
+      "functionAppName": {
+        "value": "dfc-foo-api-lmi-delta-report-fa-ver"
       },
-      "aspSize": {
-        "value": "2"
-      },
-      "aspInstances": {
-        "value": 2
+      "appServicePlanSuffix": {
+        "value": "-migrated"
       },
       "ApimLmiKey": {
         "value": "123456789"
@@ -48,12 +45,6 @@
         "value": "dfcdevappsharedstr"
       },
       "ExceptionCountThreshold": {
-          "value": "0"
-      },
-      "MemoryPercentageThreshold": {
-          "value": "0"
-      },
-      "CPUPercentageThreshold": {
           "value": "0"
       },
       "SubscriptionSettingsEndpoint": {
