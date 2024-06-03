@@ -3,22 +3,14 @@ variables:
   value: PP
 - name: WebAppPrefix
   value: dfc-pp-api-lmi-delta-report
+- name: AppServicePlanSuffix
+  value: -migrated
 - name: ResourceGroup
   value: $(WebAppPrefix)-rg
-- name: aspTier
-  value: Standard
-- name: aspInstances
-  value: 2
-- name: aspSize
-  value: 1
 - name: lmideltaReportAppDatabaseThroughput
   value: 800
 - name: ExceptionCountThreshold
   value: 10
-- name: MemoryPercentageThreshold
-  value: 75
-- name: CPUPercentageThreshold
-  value: 75
 - name: EnableAzureMonitorAlerting
   value: true
 - name: cosmosDeltaReportsCollectionName
@@ -28,13 +20,13 @@ variables:
 - name: SubscriptionSettingsEndpoint
   value: $(ApimProxyAddress)/LMI/delta-reports/lmi/webhook?subscription-key=$(apimLmiKey)
 - name: subscriptionUrl
-  value: https://dfc-pp-api-eventgridsubscriptions-fa.$(FunctionAppDomain)/api/execute/
+  value: https://dfc-pp-api-eventgridsubscriptions-fa-ver2.$(FunctionAppDomain)/api/execute/
 - name: EventGridPublishClientOptionsApiEndpoint
-  value: https://dfc-pp-api-lmi-transformation-fa.$(FunctionAppDomain)/job-groups
+  value: https://dfc-pp-api-lmi-transformation-fa-ver2.$(FunctionAppDomain)/job-groups
 - name: EventGridSubjectPrefix
   value: /$(ApplicationName)/
 - name: FunctionAppName
-  value: $(WebAppPrefix)-fa
+  value: $(WebAppPrefix)-fa-ver2
 - name: ApplicationName
   value: dfc-api-lmi-delta-report
 - name: apimLoggerName
@@ -48,6 +40,6 @@ variables:
 - name: FunctionAppUrl
   value: https://$(FunctionAppName).$(FunctionAppDomain)
 - name: DraftJobGroupClientOptionsBaseAddress
-  value: https://dfc-pp-draft-app-jobgroups-as.$(FunctionAppDomain)/api/job-groups/
+  value: https://dfc-pp-draft-app-jobgroups-as-ver2.$(FunctionAppDomain)/api/job-groups/
 - name: PublishedJobGroupClientOptionsBaseAddress
-  value: https://dfc-pp-app-jobgroups-as.$(FunctionAppDomain)/api/job-groups/
+  value: https://dfc-pp-app-jobgroups-as-ver2.$(FunctionAppDomain)/api/job-groups/

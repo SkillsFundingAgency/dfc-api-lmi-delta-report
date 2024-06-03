@@ -5,20 +5,10 @@ variables:
   value: dfc-dev-api-lmi-delta-report
 - name: ResourceGroup
   value: $(WebAppPrefix)-rg
-- name: aspTier
-  value: Standard
-- name: aspInstances
-  value: 2
-- name: aspSize
-  value: 2
 - name: lmideltaReportAppDatabaseThroughput
   value: 400
 - name: ExceptionCountThreshold
   value: 10
-- name: MemoryPercentageThreshold
-  value: 75
-- name: CPUPercentageThreshold
-  value: 75
 - name: EnableAzureMonitorAlerting
   value: true
 - name: cosmosDeltaReportsCollectionName
