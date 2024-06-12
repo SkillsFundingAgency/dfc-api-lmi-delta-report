@@ -8,25 +8,15 @@
     "appSharedStorageAccountName": {
       "type": "string"
     },
-    "aspInstances": {
-      "type": "int"
-    },
-    "aspSize": {
+    "functionAppName": {
       "type": "string"
     },
-    "aspTier": {
-      "type": "string"
+    "appServicePlanSuffix": {
+      "type": "string",
+      "defaultValue": ""
     },
     "ApimLmiKey": {
       "type": "string"
-    },
-    "aseHostingEnvironmentName": {
-      "type": "string",
-      "defaultValue": ""
-    },
-    "aseResourceGroup": {
-      "type": "string",
-      "defaultValue": ""
     },
     "environment": {
       "type": "string"
@@ -53,12 +43,6 @@
       }
     },
     "ExceptionCountThreshold": {
-      "type": "string"
-    },
-    "CPUPercentageThreshold": {
-      "type": "string"
-    },
-    "MemoryPercentageThreshold": {
       "type": "string"
     },
     "cosmosDeltaReportsCollectionName": {
@@ -123,14 +107,13 @@
     }
   },
   "variables": {
-    "appServicePlanName": "[concat(variables('resourcePrefix'), '-asp')]",
+    "appServicePlanName": "[concat(variables('resourcePrefix'), parameters('appServicePlanSuffix'), '-asp')]",
     "appServicePlanResourceGroup": "[concat(variables('resourcePrefix'),'-rg')]",
     "buildingBlocksDfcBaseUrl": "https://raw.githubusercontent.com/SkillsFundingAgency/dfc-devops/master/ArmTemplates/",
     "resourcePrefix": "[tolower(concat('dfc-', tolower(parameters('Environment')), '-api-lmi-delta-report'))]",
     "cosmosDbCollectionPartitionKey": "/PartitionKey",
     "cosmosDbDatabaseName": "dfc-api-lmi-delta-report",
     "cosmosDbEndpoint": "[concat('https://', parameters('cosmosDbName'), '.documents.azure.com:443/')]",
-    "functionAppName": "[concat(variables('ResourcePrefix'), '-fa')]",
     "functionAppInsightsName": "[concat(variables('resourcePrefix'), '-ai')]",
     "apimApiName": "[concat(parameters('apimProductName'), '-', parameters('apimApiName'))]",
     "ActionGroupName": "[concat('dfc-', replace(tolower(parameters('Environment')), '-draft', ''), '-app-sharedresources-actgrp')]"
@@ -246,7 +229,7 @@
     },
     {
       "apiVersion": "2017-05-10",
-      "name": "[variables('functionAppName')]",
+      "name": "[parameters('functionAppName')]",
       "type": "Microsoft.Resources/deployments",
       "properties": {
         "mode": "Incremental",
@@ -256,7 +239,7 @@
         },
         "parameters": {
           "appServiceName": {
-            "value": "[variables('functionAppName')]"
+            "value": "[parameters('functionAppName')]"
           },
           "appServicePlanName": {
             "value": "[variables('appServicePlanName')]"
